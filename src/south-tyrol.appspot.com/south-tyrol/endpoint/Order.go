@@ -15,18 +15,6 @@ type Order struct {
     Router *httprouter.Router
 }
 
-func (*Order) GetMy(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-    w.Header().Set("Content-Type", "application/json")
-
-    cars, err := order.GetMy(appengine.NewContext(r), network.Authorization(w, r))
-    issue.Handle(w, err, http.StatusBadRequest)
-
-    data, err := json.Marshal(cars)
-    issue.Handle(w, err, http.StatusInternalServerError)
-
-    w.Write(data)
-}
-
 func (*Order) GetOne(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
     w.Header().Set("Content-Type", "application/json")
 
