@@ -10,7 +10,7 @@ import (
 func init() {
     router := httprouter.New()
 
-    o := endpoint.Order{Router: router}
+    o := endpoint.Car{Router: router}
     o.Router.GET("/orders", o.GetAll)
     o.Router.GET("/order/:order_id", o.GetAll)
     o.Router.POST("/order", o.Add)
