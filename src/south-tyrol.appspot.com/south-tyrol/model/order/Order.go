@@ -32,24 +32,6 @@ func (order *Order) save(c appengine.Context) error {
     return nil
 }
 
-func GetMy(c appengine.Context, orderId string) ([]Order, error) {
-    q := datastore.NewQuery("Order").Filter("OrderId =", orderId)
-
-    var orders []Order
-
-    keys, err := q.GetAll(c, &orders)
-
-    if err != nil {
-        return nil, err
-    }
-
-    for i := 0; i < len(orders); i++ {
-        orders[i].OrderId = keys[i].StringID()
-    }
-
-    return orders, nil
-}
-
 func GetOne(c appengine.Context, orderId string) (*Order, error) {
     order := Order{OrderId: orderId}
 
