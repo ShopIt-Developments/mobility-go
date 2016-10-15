@@ -1,0 +1,11 @@
+application: south-tyrol
+version: 1
+service: default
+runtime: go
+api_version: go1
+auto_id_policy: default
+
+handlers:
+- url: .*
+  script: _go_app
+  secure: always
