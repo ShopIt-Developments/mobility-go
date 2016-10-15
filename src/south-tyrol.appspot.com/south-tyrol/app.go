@@ -25,5 +25,14 @@ func init() {
 	u.Router.PUT("/user", u.Update)
 	u.Router.DELETE("/user", u.Delete)
 
+	r := endpoint.Rating{Router: router}
+	r.Router.GET("/mobility/ratings", r.GetRatings)
+	r.Router.GET("/mobility/rating/:rating_id", r.GetOne)
+	r.Router.GET("/mobility/rated", r.GetRated)
+	r.Router.POST("/mobility/rating", r.Add)
+	r.Router.PUT("/mobility/rating/:rating_id", r.Update)
+	r.Router.DELETE("/mobility/rating/:rating_id", r.Delete)
+
+
 	http.Handle("/", router)
 }
