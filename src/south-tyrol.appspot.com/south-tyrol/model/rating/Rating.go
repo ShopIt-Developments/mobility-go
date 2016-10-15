@@ -7,6 +7,7 @@ import (
 	"appengine"
 	"appengine/datastore"
 	"errors"
+	"model/user"
 )
 
 type Rating struct {
@@ -102,6 +103,8 @@ func New(c appengine.Context, r io.ReadCloser, raterId string) (*Rating, error) 
 
 	rating.RaterId = raterId
 
+	user.NewRating(c, rating.RatedId, rating.Rating)
+
 	if err := rating.save(c); err != nil {
 		return nil, err
 	}
@@ -115,12 +118,16 @@ func Update(c appengine.Context, ratingId int64, r io.ReadCloser) (*Rating, erro
 	if err != nil {
 		return nil, err
 	}
+	// TODO: check that the ids are the same
+	newRating := new(Rating)
 
-	if err := json.NewDecoder(r).Decode(&rating); err != nil {
+	if err := json.NewDecoder(r).Decode(&newRating); err != nil {
 		return nil, err
 	}
 
-	if err := rating.save(c); err != nil {
+	user.UpdateRating(c, rating.RatedId, rating.Rating, newRating.Rating)
+
+	if err := newRating.save(c); err != nil {
 		return nil, err
 	}
 
@@ -133,6 +140,8 @@ func Delete(c appengine.Context, ratingId int64) (*Rating, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	user.DeleteRating(c, rating.RatedId, rating.Rating)
 
 	err = datastore.Delete(c, rating.key(c))
 

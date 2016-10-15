@@ -12,7 +12,7 @@ type User struct {
 	Name          string `json:"name"`
 	Address       string `json:"address"`
 	Telephone     string `json:"telephone"`
-	AverageRating int8 `json:"average_rating"`
+	AverageRating float32 `json:"average_rating"`
 	RatingsCount  int64`json:"ratings_count"`
 }
 
@@ -95,5 +95,49 @@ func Delete(c appengine.Context, userID string) (*User, error) {
 	}
 
 	return user, nil
+}
+
+func NewRating(c appengine.Context, userID string, rating int8) error {
+	user, err := Get(c, userID)
+
+	if err != nil {
+		return err
+	}
+
+	user.AverageRating = (user.AverageRating * float32(user.RatingsCount) + float32(rating)) / float32((user.RatingsCount + 1))
+	user.RatingsCount++
+
+	err = user.save(c)
+
+	return err
+}
+
+func UpdateRating(c appengine.Context, userID string, oldRating int8, rating int8) error {
+	user, err := Get(c, userID)
+
+	if err != nil {
+		return err
+	}
+
+	user.AverageRating = (user.AverageRating * float32(user.RatingsCount) + float32(rating) - float32(oldRating)) / float32((user.RatingsCount))
+
+	err = user.save(c)
+
+	return err
+}
+
+func DeleteRating(c appengine.Context, userID string, rating int8) error {
+	user, err := Get(c, userID)
+
+	if err != nil {
+		return err
+	}
+
+	user.AverageRating = (user.AverageRating * float32(user.RatingsCount) - float32(rating) / float32((user.RatingsCount - 1)))
+	user.RatingsCount--
+
+	err = user.save(c)
+
+	return err
 }
 
