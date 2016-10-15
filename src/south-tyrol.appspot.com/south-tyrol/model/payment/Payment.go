@@ -10,6 +10,7 @@ import (
 	"errors"
 	"time"
 	"github.com/google/go-gcm"
+	"net/http"
 )
 
 type Payment struct {
@@ -35,10 +36,10 @@ func (payment *Payment) save(c appengine.Context) error {
 	return nil
 }
 
-func New(c appengine.Context, r io.ReadCloser, orderId string) (*Payment, error) {
+func New(c appengine.Context, r *http.Request, orderId string) (*Payment, error) {
 	payment := new(Payment)
 
-	if err := json.NewDecoder(r).Decode(&payment); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&payment); err != nil {
 		return nil, err
 	}
 
@@ -48,7 +49,7 @@ func New(c appengine.Context, r io.ReadCloser, orderId string) (*Payment, error)
 		return nil, err
 	}
 
-	v, err := vehicle.GetOne(c, o.VehicleId)
+	v, err := vehicle.GetOne(c, r, o.VehicleId)
 
 	if err != nil {
 		return nil, err

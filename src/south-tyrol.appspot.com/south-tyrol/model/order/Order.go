@@ -3,10 +3,10 @@ package order
 import (
     "time"
     "id"
-    "io"
-    "appengine"
     "appengine/datastore"
     "model/vehicle"
+    "appengine"
+    "net/http"
 )
 
 type Order struct {
@@ -48,8 +48,8 @@ func GetOne(c appengine.Context, orderId string) (*Order, error) {
     return &order, nil
 }
 
-func New(c appengine.Context, r io.ReadCloser, vehicleId string, userId string) (*Order, error) {
-    v, err := vehicle.GetOne(c, vehicleId)
+func New(c appengine.Context, r *http.Request, vehicleId string, userId string) (*Order, error) {
+    v, err := vehicle.GetOne(c, r, vehicleId)
 
     if err != nil {
         return nil, err
@@ -73,14 +73,15 @@ func New(c appengine.Context, r io.ReadCloser, vehicleId string, userId string) 
     return &order, nil
 }
 
-func Delete(c appengine.Context, orderId string) (*Order, error) {
+func Delete(r *http.Request, orderId string) (*Order, error) {
+    c := appengine.NewContext(r)
     order, err := GetOne(c, orderId)
 
     if err != nil {
         return nil, err
     }
 
-    v, err := vehicle.GetOne(c, order.VehicleId)
+    v, err := vehicle.GetOne(c, r, order.VehicleId)
 
     if err != nil {
         return nil, err

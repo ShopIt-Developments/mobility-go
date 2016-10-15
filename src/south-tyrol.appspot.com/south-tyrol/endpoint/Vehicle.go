@@ -44,7 +44,7 @@ func (*Vehicle) GetAvailable(w http.ResponseWriter, r *http.Request, p httproute
         }
     }
 
-    vehicles, err := vehicle.GetAll(appengine.NewContext(r))
+    vehicles, err := vehicle.GetAll(r)
     issue.Handle(w, err, http.StatusBadRequest)
 
     data, _ := json.Marshal(vehicle.Vehicles{
@@ -58,7 +58,7 @@ func (*Vehicle) GetAvailable(w http.ResponseWriter, r *http.Request, p httproute
 func (*Vehicle) GetMy(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
     w.Header().Set("Content-Type", "application/json")
 
-    vehicles, err := vehicle.GetMy(appengine.NewContext(r), r.Header.Get("Authorization"))
+    vehicles, err := vehicle.GetMy(appengine.NewContext(r), network.Authorization(w, r))
     issue.Handle(w, err, http.StatusBadRequest)
 
     data, err := json.Marshal(vehicles)
@@ -70,7 +70,7 @@ func (*Vehicle) GetMy(w http.ResponseWriter, r *http.Request, p httprouter.Param
 func (*Vehicle) GetAll(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
     w.Header().Set("Content-Type", "application/json")
 
-    vehicles, err := vehicle.GetAll(appengine.NewContext(r))
+    vehicles, err := vehicle.GetAll(r)
     issue.Handle(w, err, http.StatusBadRequest)
 
     data, err := json.Marshal(vehicles)
@@ -82,7 +82,7 @@ func (*Vehicle) GetAll(w http.ResponseWriter, r *http.Request, p httprouter.Para
 func (*Vehicle) New(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
     w.Header().Set("Content-Type", "application/json")
 
-    entity, err := vehicle.New(appengine.NewContext(r), r.Body, network.Authorization(w, r))
+    entity, err := vehicle.New(appengine.NewContext(r), r, network.Authorization(w, r))
     issue.Handle(w, err, http.StatusBadRequest)
 
     data, err := json.Marshal(entity)
@@ -94,7 +94,7 @@ func (*Vehicle) New(w http.ResponseWriter, r *http.Request, p httprouter.Params)
 func (*Vehicle) GetOne(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
     w.Header().Set("Content-Type", "application/json")
 
-    entity, err := vehicle.GetOne(appengine.NewContext(r), p.ByName("vehicle_id"))
+    entity, err := vehicle.GetOne(appengine.NewContext(r), r, p.ByName("vehicle_id"))
     issue.Handle(w, err, http.StatusBadRequest)
 
     data, err := json.Marshal(entity)
@@ -106,7 +106,7 @@ func (*Vehicle) GetOne(w http.ResponseWriter, r *http.Request, p httprouter.Para
 func (*Vehicle) Update(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
     w.Header().Set("Content-Type", "application/json")
 
-    if _, err := vehicle.Update(appengine.NewContext(r), p.ByName("vehicle_id"), r.Body); err != nil {
+    if _, err := vehicle.Update(appengine.NewContext(r), p.ByName("vehicle_id"), r); err != nil {
         issue.Handle(w, err, http.StatusBadRequest)
     }
 
@@ -116,7 +116,7 @@ func (*Vehicle) Update(w http.ResponseWriter, r *http.Request, p httprouter.Para
 func (*Vehicle) Delete(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
     w.Header().Set("Content-Type", "application/json")
 
-    if _, err := vehicle.Delete(appengine.NewContext(r), p.ByName("vehicle_id")); err != nil {
+    if _, err := vehicle.Delete(appengine.NewContext(r), r, p.ByName("vehicle_id")); err != nil {
         issue.Handle(w, err, http.StatusBadRequest)
     }
 
