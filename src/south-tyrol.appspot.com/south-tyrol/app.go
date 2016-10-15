@@ -10,14 +10,18 @@ import (
 func init() {
 	router := httprouter.New()
 
-	c := endpoint.Car{Router: router}
-	c.Router.GET("/mobility/vehicles/available", c.GetAvailable)
-	c.Router.GET("/mobility/vehicles/my", c.GetMy)
-	c.Router.GET("/mobility/vehicles", c.GetAll)
-	c.Router.GET("/mobility/vehicle/:vehicle_id", c.GetOne)
-	c.Router.POST("/mobility/vehicle", c.Add)
-	c.Router.PUT("/mobility/vehicles/:vehicle_id", c.Update)
-	c.Router.DELETE("/mobility/vehicles/:vehicle_id", c.Delete)
+    v := endpoint.Vehicle{Router: router}
+    v.Router.GET("/mobility/vehicles/available", v.GetAvailable)
+    v.Router.GET("/mobility/vehicles/my", v.GetMy)
+    v.Router.GET("/mobility/vehicles", v.GetAll)
+    v.Router.GET("/mobility/vehicle/:vehicle_id", v.GetOne)
+    v.Router.POST("/mobility/vehicle", v.New)
+    v.Router.PUT("/mobility/vehicles/:vehicle_id", v.Update)
+    v.Router.DELETE("/mobility/vehicle/:vehicle_id", v.Delete)
+
+    o := endpoint.Order{Router: router}
+    o.Router.POST("/mobility/order/:vehicle_id", o.New)
+    o.Router.DELETE("/mobility/order/:order_id", o.Delete)
 
 	u := endpoint.User{Router: router}
 	u.Router.GET("/mobility/user", u.Get)

@@ -12,6 +12,7 @@ import (
 type Vehicle struct {
     Address      string `json:"address"`
     Availability string `json:"availability"`
+    Available    bool `json:"available"`
     Currency     string `json:"currency"`
     Description  string `json:"description"`
     VehicleId    string `json:"id" datastore:"-"`
@@ -30,7 +31,7 @@ func (vehicle *Vehicle) key(c appengine.Context) *datastore.Key {
     return datastore.NewKey(c, "Vehicle", vehicle.VehicleId, 0, nil)
 }
 
-func (vehicle *Vehicle) save(c appengine.Context) error {
+func (vehicle *Vehicle) Save(c appengine.Context) error {
     k, err := datastore.Put(c, vehicle.key(c), vehicle)
 
     if err != nil {
@@ -76,7 +77,7 @@ func GetOne(c appengine.Context, vehicleId string) (*Vehicle, error) {
 }
 
 func GetAll(c appengine.Context) ([]Vehicle, error) {
-    q := datastore.NewQuery("Vehicle")
+    q := datastore.NewQuery("Vehicle").Filter("Available =", true)
 
     var vehicles []Vehicle
 
@@ -103,7 +104,7 @@ func New(c appengine.Context, r io.ReadCloser) (*Vehicle, error) {
     vehicle.VehicleId = id.Alphanumeric()
     vehicle.QrCode = id.Alphanumeric()
 
-    if err := vehicle.save(c); err != nil {
+    if err := vehicle.Save(c); err != nil {
         return nil, err
     }
 
@@ -121,7 +122,7 @@ func Update(c appengine.Context, vehicleId string, r io.ReadCloser) (*Vehicle, e
         return nil, err
     }
 
-    if err := vehicle.save(c); err != nil {
+    if err := vehicle.Save(c); err != nil {
         return nil, err
     }
 

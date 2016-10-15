@@ -13,11 +13,11 @@ import (
     "id"
 )
 
-type Car struct {
+type Vehicle struct {
     Router *httprouter.Router
 }
 
-func (*Car) GetAvailable(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+func (*Vehicle) GetAvailable(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
     w.Header().Set("Content-Type", "application/json")
 
     response := sasa.ReadJsonFromUrl(w, r, "http://realtimetest.opensasa.info/positions")
@@ -44,7 +44,8 @@ func (*Car) GetAvailable(w http.ResponseWriter, r *http.Request, p httprouter.Pa
         }
     }
 
-    vehicles, _ := vehicle.GetAll(appengine.NewContext(r))
+    vehicles, err := vehicle.GetAll(appengine.NewContext(r))
+    issue.Handle(w, err, http.StatusBadRequest)
 
     data, _ := json.Marshal(vehicle.Vehicles{
         Vehicles: vehicles,
@@ -54,43 +55,43 @@ func (*Car) GetAvailable(w http.ResponseWriter, r *http.Request, p httprouter.Pa
     w.Write(data)
 }
 
-func (*Car) GetMy(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+func (*Vehicle) GetMy(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
     w.Header().Set("Content-Type", "application/json")
 
-    cars, err := vehicle.GetMy(appengine.NewContext(r), r.Header.Get("Authorization"))
+    vehicles, err := vehicle.GetMy(appengine.NewContext(r), r.Header.Get("Authorization"))
     issue.Handle(w, err, http.StatusBadRequest)
 
-    data, err := json.Marshal(cars)
+    data, err := json.Marshal(vehicles)
     issue.Handle(w, err, http.StatusInternalServerError)
 
     w.Write(data)
 }
 
-func (*Car) GetAll(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+func (*Vehicle) GetAll(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
     w.Header().Set("Content-Type", "application/json")
 
-    cars, err := vehicle.GetAll(appengine.NewContext(r))
+    vehicles, err := vehicle.GetAll(appengine.NewContext(r))
     issue.Handle(w, err, http.StatusBadRequest)
 
-    data, err := json.Marshal(cars)
+    data, err := json.Marshal(vehicles)
     issue.Handle(w, err, http.StatusInternalServerError)
 
     w.Write(data)
 }
 
-func (*Car) Add(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+func (*Vehicle) New(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
     w.Header().Set("Content-Type", "application/json")
 
     entity, err := vehicle.New(appengine.NewContext(r), r.Body)
     issue.Handle(w, err, http.StatusBadRequest)
 
-    data, err := json.Marshal(id.Id{Id: entity.UserId})
+    data, err := json.Marshal(id.Id{Id: entity.VehicleId})
     issue.Handle(w, err, http.StatusInternalServerError)
 
     w.Write(data)
 }
 
-func (*Car) GetOne(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+func (*Vehicle) GetOne(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
     w.Header().Set("Content-Type", "application/json")
 
     entity, err := vehicle.GetOne(appengine.NewContext(r), p.ByName("vehicle_id"))
@@ -102,7 +103,7 @@ func (*Car) GetOne(w http.ResponseWriter, r *http.Request, p httprouter.Params) 
     w.Write(data)
 }
 
-func (*Car) Update(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+func (*Vehicle) Update(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
     w.Header().Set("Content-Type", "application/json")
 
     if _, err := vehicle.Update(appengine.NewContext(r), p.ByName("vehicle_id"), r.Body); err != nil {
@@ -112,7 +113,7 @@ func (*Car) Update(w http.ResponseWriter, r *http.Request, p httprouter.Params) 
     w.WriteHeader(http.StatusNoContent)
 }
 
-func (*Car) Delete(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+func (*Vehicle) Delete(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
     w.Header().Set("Content-Type", "application/json")
 
     if _, err := vehicle.Delete(appengine.NewContext(r), p.ByName("vehicle_id")); err != nil {
