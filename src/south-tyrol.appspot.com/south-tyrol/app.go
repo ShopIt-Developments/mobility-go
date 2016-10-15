@@ -38,7 +38,7 @@ func init() {
 	r.Router.GET("/mobility/rated", r.GetRated)
 	r.Router.POST("/mobility/rating", r.Add)
 	r.Router.PUT("/mobility/ratings/:rating_id", r.Update)
-	r.Router.DELETE("/mobility/rating/s:rating_id", r.Delete)
+	r.Router.DELETE("/mobility/rating/:rating_id", r.Delete)
 
 	http.Handle("/", router)
 }

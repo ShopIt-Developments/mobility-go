@@ -10,10 +10,11 @@ import (
 )
 
 type Order struct {
-    UserId    string `json:"user_id"`
-    VehicleId string `json:"user_id"`
-    OrderId   string `json:"order_id" datastore:"-"`
-    OrderDate time.Time `json:"order_date"`
+    UserId     string `json:"user_id"`
+    VehicleId  string `json:"user_id"`
+    OrderId    string `json:"order_id" datastore:"-"`
+    OrderDate  time.Time `json:"ordered_at"`
+    BilledDate time.Time `json:"billed_at"`
 }
 
 func (order *Order) key(c appengine.Context) *datastore.Key {
