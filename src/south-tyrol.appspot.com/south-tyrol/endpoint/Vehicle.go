@@ -85,6 +85,8 @@ func (*Vehicle) New(w http.ResponseWriter, r *http.Request, p httprouter.Params)
     entity, err := vehicle.New(appengine.NewContext(r), r.Body, network.Authorization(w, r))
     issue.Handle(w, err, http.StatusBadRequest)
 
+    entity.Available = true
+
     data, err := json.Marshal(entity)
     issue.Handle(w, err, http.StatusInternalServerError)
 
