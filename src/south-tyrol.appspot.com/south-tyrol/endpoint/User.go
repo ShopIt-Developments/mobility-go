@@ -22,7 +22,7 @@ func (*User) Get(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	userId := r.Header.Get("Authorization")
 
 	if userId == "" {
-		issue.Handle(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+		issue.Handle(w, errors.New(http.StatusText(http.StatusUnauthorized)), http.StatusUnauthorized)
 		return
 	}
 
@@ -41,7 +41,7 @@ func (*User) Add(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	userID := r.Header.Get("Authorization")
 
 	if userID == "" {
-		issue.Handle(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+		issue.Handle(w, errors.New(http.StatusText(http.StatusUnauthorized)), http.StatusUnauthorized)
 		return
 	}
 
@@ -60,7 +60,7 @@ func (*User) AddPoints(w http.ResponseWriter, r *http.Request, p httprouter.Para
 	userId := r.Header.Get("Authorization")
 
 	if userId == "" {
-		issue.Handle(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+		issue.Handle(w, errors.New(http.StatusText(http.StatusUnauthorized)), http.StatusUnauthorized)
 		return
 	}
 
@@ -90,7 +90,7 @@ func (*User) GetPoints(w http.ResponseWriter, r *http.Request, p httprouter.Para
 	userId := r.Header.Get("Authorization")
 
 	if userId == "" {
-		issue.Handle(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+		issue.Handle(w, errors.New(http.StatusText(http.StatusUnauthorized)), http.StatusUnauthorized)
 		return
 	}
 
@@ -109,7 +109,7 @@ func (*User) Update(w http.ResponseWriter, r *http.Request, p httprouter.Params)
 	userID := r.Header.Get("Authorization")
 
 	if userID == "" {
-		issue.Handle(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+		issue.Handle(w, errors.New(http.StatusText(http.StatusUnauthorized)), http.StatusUnauthorized)
 		return
 	}
 
@@ -126,7 +126,7 @@ func (*User) Delete(w http.ResponseWriter, r *http.Request, p httprouter.Params)
 	userID := r.Header.Get("Authorization")
 
 	if userID == "" {
-		issue.Handle(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+		issue.Handle(w, errors.New(http.StatusText(http.StatusUnauthorized)), http.StatusUnauthorized)
 		return
 	}
 
