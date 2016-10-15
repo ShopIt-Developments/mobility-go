@@ -46,8 +46,7 @@ func (vehicle *Vehicle) Save(c appengine.Context) error {
 func GetMy(c appengine.Context, userId string) ([]Vehicle, error) {
     q := datastore.NewQuery("Vehicle").Filter("UserId =", userId)
 
-    var vehicles []Vehicle
-
+    vehicles := []Vehicle{}
     keys, err := q.GetAll(c, &vehicles)
 
     if err != nil {
@@ -79,8 +78,7 @@ func GetOne(c appengine.Context, vehicleId string) (*Vehicle, error) {
 func GetAll(c appengine.Context) ([]Vehicle, error) {
     q := datastore.NewQuery("Vehicle").Filter("Available =", true)
 
-    var vehicles []Vehicle
-
+    vehicles := []Vehicle{}
     keys, err := q.GetAll(c, &vehicles)
 
     if err != nil {
