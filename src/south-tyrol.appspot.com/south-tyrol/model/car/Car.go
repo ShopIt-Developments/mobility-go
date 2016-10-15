@@ -6,17 +6,24 @@ import (
     "appengine"
     "appengine/datastore"
     "encoding/json"
+    "util"
 )
 
 type Car struct {
-    LicensePlate string `json:"license_plate" datastore:"-"`
+    CarId        string `json:"car_id" datastore:"-"`
+    LicensePlate string `json:"license_plate"`
     Description  string `json:"description"`
     PricePerHour float64 `json:"price_per_hour"`
+    Currency     string `json:"currency"`
     Availability Availability `json:"availability"`
 }
 
 func (car *Car) key(c appengine.Context) *datastore.Key {
-    return datastore.NewKey(c, "Car", car.LicensePlate, 0, nil)
+    if car.CarId == "" {
+        return datastore.NewKey(c, "Car", util.Alphanumeric(), 0, nil)
+    }
+
+    return datastore.NewKey(c, "Car", car.CarId, 0, nil)
 }
 
 func (car *Car) save(c appengine.Context) error {
@@ -26,13 +33,13 @@ func (car *Car) save(c appengine.Context) error {
         return err
     }
 
-    car.LicensePlate = k.StringID()
+    car.CarId = k.StringID()
 
     return nil
 }
 
 func GetOne(c appengine.Context, carId string) (*Car, error) {
-    car := Car{LicensePlate: carId}
+    car := Car{CarId: carId}
 
     k := car.key(c)
     err := datastore.Get(c, k, &car)
@@ -41,7 +48,7 @@ func GetOne(c appengine.Context, carId string) (*Car, error) {
         return nil, err
     }
 
-    car.LicensePlate = k.StringID()
+    car.CarId = k.StringID()
 
     return &car, nil
 }
@@ -58,7 +65,7 @@ func GetAll(c appengine.Context) ([]Car, error) {
     }
 
     for i := 0; i < len(cars); i++ {
-        cars[i].LicensePlate = keys[i].StringID()
+        cars[i].CarId = keys[i].StringID()
     }
 
     return cars, nil

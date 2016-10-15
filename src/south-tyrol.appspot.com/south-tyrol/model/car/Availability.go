@@ -1,6 +1,6 @@
 package car
 
 type Availability struct {
-    Begin string `json:"begin"`
-    End string `json:"end"`
+    From string `json:"from"`
+    To   string `json:"to"`
 }

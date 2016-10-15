@@ -13,7 +13,6 @@ type Car struct {
     Router *httprouter.Router
 }
 
-//noinspection GoUnusedParameter
 func (*Car) GetAll(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
     w.Header().Set("Content-Type", "application/json")
 
@@ -26,7 +25,6 @@ func (*Car) GetAll(w http.ResponseWriter, r *http.Request, p httprouter.Params) 
     w.Write(data)
 }
 
-//noinspection GoUnusedParameter
 func (*Car) Add(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
     w.Header().Set("Content-Type", "application/json")
 
@@ -42,7 +40,7 @@ func (*Car) Add(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 func (*Car) GetOne(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
     w.Header().Set("Content-Type", "application/json")
 
-    entity, err := car.GetOne(appengine.NewContext(r), p.ByName("license_plate"))
+    entity, err := car.GetOne(appengine.NewContext(r), p.ByName("car_id"))
     issue.Handle(w, err, http.StatusBadRequest)
 
     data, err := json.Marshal(entity)
@@ -54,7 +52,7 @@ func (*Car) GetOne(w http.ResponseWriter, r *http.Request, p httprouter.Params) 
 func (*Car) Update(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
     w.Header().Set("Content-Type", "application/json")
 
-    if _, err := car.Update(appengine.NewContext(r), p.ByName("license_plate"), r.Body); err != nil {
+    if _, err := car.Update(appengine.NewContext(r), p.ByName("car_id"), r.Body); err != nil {
         issue.Handle(w, err, http.StatusBadRequest)
     }
 
@@ -64,7 +62,7 @@ func (*Car) Update(w http.ResponseWriter, r *http.Request, p httprouter.Params) 
 func (*Car) Delete(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
     w.Header().Set("Content-Type", "application/json")
 
-    if _, err := car.Delete(appengine.NewContext(r), p.ByName("license_plate")); err != nil {
+    if _, err := car.Delete(appengine.NewContext(r), p.ByName("car_id")); err != nil {
         issue.Handle(w, err, http.StatusBadRequest)
     }
 

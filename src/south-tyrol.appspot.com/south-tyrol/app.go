@@ -10,13 +10,12 @@ import (
 func init() {
     router := httprouter.New()
 
-    o := endpoint.Car{Router: router}
-    o.Router.GET("/orders", o.GetAll)
-    o.Router.GET("/order/:order_id", o.GetAll)
-    o.Router.POST("/order", o.Add)
-    o.Router.POST("/order/accept/:order_id", o.Accept)
-    o.Router.PUT("/order/:order_id", o.Update)
-    o.Router.DELETE("/order/:order_id", o.Delete)
+    c := endpoint.Car{Router: router}
+    c.Router.GET("/cars", c.GetAll)
+    c.Router.GET("/car/:car_id", c.GetOne)
+    c.Router.POST("/car", c.Add)
+    c.Router.PUT("/car/:car_id", c.Update)
+    c.Router.DELETE("/car/:car_id", c.Delete)
 
     http.Handle("/", router)
 }
