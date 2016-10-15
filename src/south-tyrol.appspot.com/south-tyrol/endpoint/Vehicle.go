@@ -10,7 +10,7 @@ import (
     "model/sasa"
     "strconv"
     "strings"
-    "model"
+    "id"
 )
 
 type Car struct {
@@ -84,7 +84,7 @@ func (*Car) Add(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
     entity, err := vehicle.New(appengine.NewContext(r), r.Body)
     issue.Handle(w, err, http.StatusBadRequest)
 
-    data, err := json.Marshal(model.Id{Id: entity.UserId})
+    data, err := json.Marshal(id.Id{Id: entity.UserId})
     issue.Handle(w, err, http.StatusInternalServerError)
 
     w.Write(data)
@@ -93,7 +93,7 @@ func (*Car) Add(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 func (*Car) GetOne(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
     w.Header().Set("Content-Type", "application/json")
 
-    entity, err := vehicle.GetOne(appengine.NewContext(r), p.ByName("car_id"))
+    entity, err := vehicle.GetOne(appengine.NewContext(r), p.ByName("vehicle_id"))
     issue.Handle(w, err, http.StatusBadRequest)
 
     data, err := json.Marshal(entity)
@@ -105,7 +105,7 @@ func (*Car) GetOne(w http.ResponseWriter, r *http.Request, p httprouter.Params) 
 func (*Car) Update(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
     w.Header().Set("Content-Type", "application/json")
 
-    if _, err := vehicle.Update(appengine.NewContext(r), p.ByName("car_id"), r.Body); err != nil {
+    if _, err := vehicle.Update(appengine.NewContext(r), p.ByName("vehicle_id"), r.Body); err != nil {
         issue.Handle(w, err, http.StatusBadRequest)
     }
 
@@ -115,7 +115,7 @@ func (*Car) Update(w http.ResponseWriter, r *http.Request, p httprouter.Params) 
 func (*Car) Delete(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
     w.Header().Set("Content-Type", "application/json")
 
-    if _, err := vehicle.Delete(appengine.NewContext(r), p.ByName("car_id")); err != nil {
+    if _, err := vehicle.Delete(appengine.NewContext(r), p.ByName("vehicle_id")); err != nil {
         issue.Handle(w, err, http.StatusBadRequest)
     }
 
