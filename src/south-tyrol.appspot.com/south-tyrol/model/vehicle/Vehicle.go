@@ -102,7 +102,7 @@ func New(c appengine.Context, r io.ReadCloser) (*Vehicle, error) {
     }
 
     vehicle.VehicleId = id.Alphanumeric()
-    vehicle.QrCode = id.Alphanumeric()
+    vehicle.QrCode = ""
 
     if err := vehicle.Save(c); err != nil {
         return nil, err

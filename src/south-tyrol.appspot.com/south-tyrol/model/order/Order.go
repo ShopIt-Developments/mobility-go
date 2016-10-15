@@ -73,6 +73,7 @@ func New(c appengine.Context, r io.ReadCloser, vehicleId string, userId string) 
     }
 
     v.Available = false
+    v.QrCode = id.Alphanumeric()
     v.Save(c)
 
     order := Order{
@@ -103,6 +104,7 @@ func Delete(c appengine.Context, orderId string) (*Order, error) {
     }
 
     v.Available = true
+    v.QrCode = ""
     v.Save(c)
 
     err = datastore.Delete(c, order.key(c))
