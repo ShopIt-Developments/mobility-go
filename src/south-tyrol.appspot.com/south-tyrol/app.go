@@ -19,7 +19,7 @@ func init() {
     router.GET("/mobility/vehicles/available", rt)
 
     c := endpoint.Car{Router: router}
-    c.Router.GET("/mobility/vehicles/my", c.GetOwn)
+    c.Router.GET("/mobility/vehicles/my", c.GetMy)
     c.Router.GET("/mobility/vehicles", c.GetAll)
     c.Router.GET("/mobility/vehicle/:vehicle_id", c.GetOne)
     c.Router.POST("/mobility/vehicle", c.Add)

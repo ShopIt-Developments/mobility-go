@@ -53,7 +53,7 @@ func (*Car) GetAvailable(w http.ResponseWriter, r *http.Request, p httprouter.Pa
     w.Write(data)
 }
 
-func (*Car) GetOwn(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+func (*Car) GetMy(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
     w.Header().Set("Content-Type", "application/json")
 
     cars, err := vehicle.GetMy(appengine.NewContext(r), r.Header.Get("Authorization"))
