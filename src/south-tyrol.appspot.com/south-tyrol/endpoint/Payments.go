@@ -32,6 +32,6 @@ func (*Payments) Accept(w http.ResponseWriter, r *http.Request, p httprouter.Par
 	err := payment.Accept(r.Body)
 	issue.Handle(w, err, http.StatusBadRequest)
 
-	_, err = order.Delete(r, p.ByName("order_id"))
+	_, err = order.Delete(wr, p.ByName("order_id"))
 	issue.Handle(w, err, http.StatusInternalServerError)
 }
