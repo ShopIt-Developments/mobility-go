@@ -11,7 +11,7 @@ import (
 
 type Car struct {
     CarId        string `json:"car_id" datastore:"-"`
-    LicensePlate string `json:"license_plate"`
+    LicencePlate string `json:"licence_plate"`
     Description  string `json:"description"`
     PricePerHour float64 `json:"price_per_hour"`
     Currency     string `json:"currency"`
