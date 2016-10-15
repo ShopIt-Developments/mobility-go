@@ -73,6 +73,7 @@ func (*User) AddPoints(w http.ResponseWriter, r *http.Request, p httprouter.Para
 
 	if points < 0 {
 		issue.Handle(w, errors.New("Points cannot be negative"), http.StatusBadRequest)
+		return
 	}
 
 	entity, err := user.AddPoints(appengine.NewContext(r), userId, points)
@@ -106,14 +107,14 @@ func (*User) GetPoints(w http.ResponseWriter, r *http.Request, p httprouter.Para
 func (*User) Update(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	w.Header().Set("Content-Type", "application/json")
 
-	userID := r.Header.Get("Authorization")
+	userId := r.Header.Get("Authorization")
 
-	if userID == "" {
+	if userId == "" {
 		issue.Handle(w, errors.New(http.StatusText(http.StatusUnauthorized)), http.StatusUnauthorized)
 		return
 	}
 
-	if _, err := user.Update(appengine.NewContext(r), userID, r.Body); err != nil {
+	if _, err := user.Update(appengine.NewContext(r), userId, r.Body); err != nil {
 		issue.Handle(w, err, http.StatusBadRequest)
 	}
 
@@ -123,14 +124,14 @@ func (*User) Update(w http.ResponseWriter, r *http.Request, p httprouter.Params)
 func (*User) Delete(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	w.Header().Set("Content-Type", "application/json")
 
-	userID := r.Header.Get("Authorization")
+	userId := r.Header.Get("Authorization")
 
-	if userID == "" {
+	if userId == "" {
 		issue.Handle(w, errors.New(http.StatusText(http.StatusUnauthorized)), http.StatusUnauthorized)
 		return
 	}
 
-	if _, err := user.Delete(appengine.NewContext(r), userID); err != nil {
+	if _, err := user.Delete(appengine.NewContext(r), userId); err != nil {
 		issue.Handle(w, err, http.StatusBadRequest)
 	}
 

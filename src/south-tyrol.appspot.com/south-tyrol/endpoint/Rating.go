@@ -18,14 +18,14 @@ type Rating struct {
 func (*Rating) Add(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	w.Header().Set("Content-Type", "application/json")
 
-	userID := r.Header.Get("Authorization")
+	userId := r.Header.Get("Authorization")
 
-	if userID == "" {
+	if userId == "" {
 		issue.Handle(w, errors.New("Unauthorized"), http.StatusUnauthorized)
 		return
 	}
 
-	entity, err := rating.New(appengine.NewContext(r), r.Body, userID)
+	entity, err := rating.New(appengine.NewContext(r), r.Body, userId)
 	issue.Handle(w, err, http.StatusBadRequest)
 
 	data, err := json.Marshal(entity)

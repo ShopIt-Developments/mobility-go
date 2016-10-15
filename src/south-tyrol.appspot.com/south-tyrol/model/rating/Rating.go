@@ -118,7 +118,7 @@ func Update(c appengine.Context, ratingId int64, r io.ReadCloser) (*Rating, erro
 	if err != nil {
 		return nil, err
 	}
-	// TODO: check that the ids are the same
+
 	newRating := new(Rating)
 
 	if err := json.NewDecoder(r).Decode(&newRating); err != nil {
