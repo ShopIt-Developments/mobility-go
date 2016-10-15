@@ -13,7 +13,7 @@ type Order struct {
     UserId     string `json:"user_id"`
     VehicleId  string `json:"user_id"`
     OrderId    string `json:"order_id" datastore:"-"`
-    OrderDate  time.Time `json:"ordered_at"`
+    OrderDate  time.Time `json:"order_date"`
     BilledDate time.Time `json:"billed_at"`
 }
 

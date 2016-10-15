@@ -40,5 +40,8 @@ func init() {
 	r.Router.PUT("/mobility/ratings/:rating_id", r.Update)
 	r.Router.DELETE("/mobility/rating/:rating_id", r.Delete)
 
+    t := endpoint.Trip{Router: router}
+    t.Router.POST("/mobility/trip", t.New)
+
 	http.Handle("/", router)
 }
