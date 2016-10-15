@@ -10,6 +10,7 @@ import (
     "model/sasa"
     "strconv"
     "strings"
+    "model"
 )
 
 type Car struct {
@@ -83,7 +84,7 @@ func (*Car) Add(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
     entity, err := vehicle.New(appengine.NewContext(r), r.Body)
     issue.Handle(w, err, http.StatusBadRequest)
 
-    data, err := json.Marshal(entity)
+    data, err := json.Marshal(model.Id{Id: entity.UserId})
     issue.Handle(w, err, http.StatusInternalServerError)
 
     w.Write(data)
