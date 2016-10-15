@@ -15,7 +15,7 @@ type Car struct {
     Description  string `json:"description"`
     PricePerHour float64 `json:"price_per_hour"`
     Currency     string `json:"currency"`
-    Availability Availability `json:"availability"`
+    Availability string `json:"availability"`
 }
 
 func (car *Car) key(c appengine.Context) *datastore.Key {
