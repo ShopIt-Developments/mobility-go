@@ -26,12 +26,9 @@ func (*Trip) New(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
     duration := travel.Arrival.Sub(travel.Departure)
     points := int(duration.Minutes() * POINTS_PER_TRIP)
 
-    data, err := json.Marshal(trip.TripResponse{
-        Points: int(points),
-        Duration: duration.String(),
-    })
-
+    data, err := json.Marshal(trip.TripResponse{Points: int(points), Duration: duration.String()})
     issue.Handle(w, err, http.StatusInternalServerError)
+
     user.AddPoints(appengine.NewContext(r), travel.UserId, int64(points))
 
     w.Write(data)
