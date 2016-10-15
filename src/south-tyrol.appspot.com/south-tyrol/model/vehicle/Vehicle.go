@@ -99,6 +99,7 @@ func New(c appengine.Context, r io.ReadCloser, userId string) (*Vehicle, error) 
 		return nil, err
 	}
 
+	vehicle.Available = true
 	vehicle.Owner = userId
 	vehicle.VehicleId = id.Alphanumeric()
 	vehicle.QrCode = ""
