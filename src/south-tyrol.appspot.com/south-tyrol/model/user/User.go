@@ -12,6 +12,7 @@ type User struct {
 	Name          string `json:"name"`
 	Address       string `json:"address"`
 	Telephone     string `json:"telephone"`
+	Points        int64 `json:"points"`
 	AverageRating float32 `json:"average_rating"`
 	RatingsCount  int64`json:"ratings_count"`
 }
@@ -32,16 +33,37 @@ func (user *User) save(c appengine.Context) error {
 	return nil
 }
 
-func New(c appengine.Context, r io.ReadCloser, userID string) (*User, error) {
+func New(c appengine.Context, r io.ReadCloser, userId string) (*User, error) {
 	user := new(User)
 
 	if err := json.NewDecoder(r).Decode(&user); err != nil {
 		return nil, err
 	}
 
-	user.UserID = userID
+	user.UserID = userId
+	user.Points = 0
+	user.AverageRating = 0
+	user.RatingsCount = 0
 
 	if err := user.save(c); err != nil {
+		return nil, err
+	}
+
+	return user, nil
+}
+
+func AddPoints(c appengine.Context, userId string, points int64) (*User, error) {
+	user, err := Get(c, userId)
+
+	if err != nil {
+		return nil, err
+	}
+
+	user.Points += points
+
+	user.save(c)
+
+	if err != nil {
 		return nil, err
 	}
 

@@ -9,6 +9,7 @@ import (
 	"model/user"
 
 	"errors"
+	"strconv"
 )
 
 type User struct {
@@ -45,6 +46,36 @@ func (*User) Add(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	}
 
 	entity, err := user.New(appengine.NewContext(r), r.Body, userID)
+	issue.Handle(w, err, http.StatusBadRequest)
+
+	data, err := json.Marshal(entity)
+	issue.Handle(w, err, http.StatusInternalServerError)
+
+	w.Write(data)
+}
+
+func (*User) AddPoints(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	w.Header().Set("Content-Type", "application/json")
+
+	userId := r.Header.Get("Authorization")
+
+	if userId == "" {
+		issue.Handle(w, errors.New("Unauthorized"), http.StatusUnauthorized)
+		return
+	}
+
+	points, err := strconv.ParseInt(p.ByName("points"), 10, 64)
+
+	if err != nil {
+		issue.Handle(w, err, http.StatusBadRequest)
+		return
+	}
+
+	if points < 0 {
+		issue.Handle(w, errors.New("Points cannot be negative"), http.StatusBadRequest)
+	}
+
+	entity, err := user.AddPoints(appengine.NewContext(r), userId, points)
 	issue.Handle(w, err, http.StatusBadRequest)
 
 	data, err := json.Marshal(entity)
