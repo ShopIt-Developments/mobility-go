@@ -43,5 +43,9 @@ func init() {
     t := endpoint.Trip{Router: router}
     t.Router.POST("/mobility/trip", t.New)
 
+	p := endpoint.Payments{Router: router}
+	p.Router.POST("/mobility/payments/scan/:order_id", p.Scan)
+	p.Router.POST("/mobility/payments/accept/:order_id", p.Accept)
+
 	http.Handle("/", router)
 }
