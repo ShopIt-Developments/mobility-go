@@ -8,10 +8,12 @@ import (
 )
 
 type User struct {
-	UserID    string `json:"user_id" datastore:"-"`
-	Name      string `json:"name"`
-	Address   string `json:"address"`
-	Telephone string `json:"telephone"`
+	UserID        string `json:"user_id" datastore:"-"`
+	Name          string `json:"name"`
+	Address       string `json:"address"`
+	Telephone     string `json:"telephone"`
+	AverageRating int8 `json:"average_rating"`
+	RatingsCount  int64`json:"ratings_count"`
 }
 
 func (user *User) key(c appengine.Context) *datastore.Key {
@@ -46,8 +48,8 @@ func New(c appengine.Context, r io.ReadCloser, userID string) (*User, error) {
 	return user, nil
 }
 
-func Get(c appengine.Context, carId string) (*User, error) {
-	user := User{UserID: carId}
+func Get(c appengine.Context, userId string) (*User, error) {
+	user := User{UserID: userId}
 
 	k := user.key(c)
 	err := datastore.Get(c, k, &user)
@@ -79,8 +81,8 @@ func Update(c appengine.Context, userID string, r io.ReadCloser) (*User, error) 
 	return user, nil
 }
 
-func Delete(c appengine.Context, id string) (*User, error) {
-	user, err := Get(c, id)
+func Delete(c appengine.Context, userID string) (*User, error) {
+	user, err := Get(c, userID)
 
 	if err != nil {
 		return nil, err
@@ -94,3 +96,4 @@ func Delete(c appengine.Context, id string) (*User, error) {
 
 	return user, nil
 }
+
