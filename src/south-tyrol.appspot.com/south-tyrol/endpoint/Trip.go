@@ -11,7 +11,7 @@ import (
     "model/user"
 )
 
-const POINTS_PER_TRIP
+const POINTS_PER_TRIP = 10
 
 type Trip struct {
     Router *httprouter.Router
