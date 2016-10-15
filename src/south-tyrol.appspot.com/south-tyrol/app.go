@@ -22,17 +22,19 @@ func init() {
 	u := endpoint.User{Router: router}
 	u.Router.GET("/mobility/user", u.Get)
 	u.Router.POST("/mobility/user", u.Add)
-	u.Router.POST("/mobility/points/:points", u.AddPoints)
 	u.Router.PUT("/mobility/user", u.Update)
 	u.Router.DELETE("/mobility/user", u.Delete)
 
+	u.Router.GET("/mobility/points", u.GetPoints)
+	u.Router.POST("/mobility/points/:points", u.AddPoints)
+
 	r := endpoint.Rating{Router: router}
 	r.Router.GET("/mobility/ratings", r.GetRatings)
-	r.Router.GET("/mobility/rating/:rating_id", r.GetOne)
+	r.Router.GET("/mobility/ratings/:rating_id", r.GetOne)
 	r.Router.GET("/mobility/rated", r.GetRated)
 	r.Router.POST("/mobility/rating", r.Add)
-	r.Router.PUT("/mobility/rating/:rating_id", r.Update)
-	r.Router.DELETE("/mobility/rating/:rating_id", r.Delete)
+	r.Router.PUT("/mobility/ratings/:rating_id", r.Update)
+	r.Router.DELETE("/mobility/rating/s:rating_id", r.Delete)
 
 	http.Handle("/", router)
 }

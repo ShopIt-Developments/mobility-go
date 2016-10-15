@@ -19,14 +19,14 @@ type User struct {
 func (*User) Get(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	w.Header().Set("Content-Type", "application/json")
 
-	userID := r.Header.Get("Authorization")
+	userId := r.Header.Get("Authorization")
 
-	if userID == "" {
+	if userId == "" {
 		issue.Handle(w, errors.New("Unauthorized"), http.StatusUnauthorized)
 		return
 	}
 
-	entity, err := user.Get(appengine.NewContext(r), userID)
+	entity, err := user.Get(appengine.NewContext(r), userId)
 	issue.Handle(w, err, http.StatusBadRequest)
 
 	data, err := json.Marshal(entity)
@@ -76,6 +76,25 @@ func (*User) AddPoints(w http.ResponseWriter, r *http.Request, p httprouter.Para
 	}
 
 	entity, err := user.AddPoints(appengine.NewContext(r), userId, points)
+	issue.Handle(w, err, http.StatusBadRequest)
+
+	data, err := json.Marshal(entity)
+	issue.Handle(w, err, http.StatusInternalServerError)
+
+	w.Write(data)
+}
+
+func (*User) GetPoints(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	w.Header().Set("Content-Type", "application/json")
+
+	userId := r.Header.Get("Authorization")
+
+	if userId == "" {
+		issue.Handle(w, errors.New("Unauthorized"), http.StatusUnauthorized)
+		return
+	}
+
+	entity, err := user.GetPoints(appengine.NewContext(r), userId)
 	issue.Handle(w, err, http.StatusBadRequest)
 
 	data, err := json.Marshal(entity)

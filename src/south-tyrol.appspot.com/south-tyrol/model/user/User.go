@@ -52,7 +52,7 @@ func New(c appengine.Context, r io.ReadCloser, userId string) (*User, error) {
 	return user, nil
 }
 
-func AddPoints(c appengine.Context, userId string, points int64) (*User, error) {
+func AddPoints(c appengine.Context, userId string, points int64) (*Points, error) {
 	user, err := Get(c, userId)
 
 	if err != nil {
@@ -67,7 +67,17 @@ func AddPoints(c appengine.Context, userId string, points int64) (*User, error) 
 		return nil, err
 	}
 
-	return user, nil
+	return &Points{Points: user.Points}, nil
+}
+
+func GetPoints(c appengine.Context, userId string) (*Points, error) {
+	user, err := Get(c, userId)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &Points{Points: user.Points}, nil
 }
 
 func Get(c appengine.Context, userId string) (*User, error) {
