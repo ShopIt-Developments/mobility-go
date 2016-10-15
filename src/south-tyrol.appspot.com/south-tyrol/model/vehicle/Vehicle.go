@@ -22,9 +22,9 @@ type Vehicle struct {
     Longitude    float64 `json:"lng"`
     Name         string `json:"name"`
     PricePerHour float64 `json:"price_per_hour"`
-    QrCode       string `json:"qr_code"`
+    QrCode       string `json:"qr_code,omitempty"`
     Type         string `json:"type"`
-    UserId       string `json:"user_id"`
+    Owner        string `json:"owner"`
 }
 
 func (vehicle *Vehicle) key(c appengine.Context) *datastore.Key {
@@ -94,13 +94,14 @@ func GetAll(c appengine.Context) ([]Vehicle, error) {
     return vehicles, nil
 }
 
-func New(c appengine.Context, r io.ReadCloser) (*Vehicle, error) {
+func New(c appengine.Context, r io.ReadCloser, userId string) (*Vehicle, error) {
     vehicle := new(Vehicle)
 
     if err := json.NewDecoder(r).Decode(&vehicle); err != nil {
         return nil, err
     }
 
+    vehicle.Owner = userId
     vehicle.VehicleId = id.Alphanumeric()
     vehicle.QrCode = ""
 

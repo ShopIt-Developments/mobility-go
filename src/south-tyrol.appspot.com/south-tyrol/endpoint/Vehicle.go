@@ -11,6 +11,7 @@ import (
     "strconv"
     "strings"
     "id"
+    "network"
 )
 
 type Vehicle struct {
@@ -82,7 +83,7 @@ func (*Vehicle) GetAll(w http.ResponseWriter, r *http.Request, p httprouter.Para
 func (*Vehicle) New(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
     w.Header().Set("Content-Type", "application/json")
 
-    entity, err := vehicle.New(appengine.NewContext(r), r.Body)
+    entity, err := vehicle.New(appengine.NewContext(r), r.Body, network.Authorization(w, r))
     issue.Handle(w, err, http.StatusBadRequest)
 
     data, err := json.Marshal(id.Id{Id: entity.VehicleId})
