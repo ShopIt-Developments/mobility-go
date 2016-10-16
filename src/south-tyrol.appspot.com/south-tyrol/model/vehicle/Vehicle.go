@@ -12,6 +12,7 @@ import (
 type Vehicle struct {
     Address      string `json:"address"`
     Availability string `json:"availability"`
+    Available    bool `json:"available"`
     Borrower     string `json:"borrower"`
     Currency     string `json:"currency"`
     Description  string `json:"description"`
@@ -100,7 +101,7 @@ func GetOne(c appengine.Context, r *http.Request, vehicleId string) (*Vehicle, e
 }
 
 func GetAll(r *http.Request) ([]Vehicle, error) {
-    q := datastore.NewQuery("Vehicle").Filter("Borrower !=", "")
+    q := datastore.NewQuery("Vehicle").Filter("Available =", true)
 
     vehicles := []Vehicle{}
     keys, err := q.GetAll(appengine.NewContext(r), &vehicles)

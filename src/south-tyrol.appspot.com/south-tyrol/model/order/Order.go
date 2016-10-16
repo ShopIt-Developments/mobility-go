@@ -49,17 +49,6 @@ func GetOne(c appengine.Context, orderId string) (*Order, error) {
     return &order, nil
 }
 
-/*func GetMulti(c appengine.Context, userId string) (*[]Order, error) {
-    orders := []Order{}
-    _, err := datastore.NewQuery("Order").Filter("UserId =", userId).GetAll(c, &orders)
-
-    if err != nil {
-        return nil, err
-    }
-
-    return orders, nil
-}*/
-
 func New(c appengine.Context, r *http.Request, vehicleId string, userId string) (*Order, error) {
     v, err := vehicle.GetOne(c, r, vehicleId)
 
@@ -67,6 +56,7 @@ func New(c appengine.Context, r *http.Request, vehicleId string, userId string) 
         return nil, err
     }
 
+    v.Available = true
     v.Borrower = userId
     v.QrCode = id.Alphanumeric()
     v.Save(c)
@@ -102,6 +92,7 @@ func Delete(r *http.Request, orderId string) (*Order, error) {
 	user.AddOfferedVehicle(c, v.Owner)
 	user.AddUsedVehicle(c, Order{}.UserId)
 
+    v.Available = true
     v.Borrower = ""
     v.QrCode = ""
     v.Save(c)
