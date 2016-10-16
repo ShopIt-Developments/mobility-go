@@ -26,7 +26,7 @@ func (*Trip) New(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	duration := travel.Arrival.Sub(travel.Departure)
 	points := int(duration.Minutes() * POINTS_PER_TRIP)
 
-	user.AddDuration(appengine.NewContext(r), network.Authorization(w, r), duration)
+	user.AddDuration(appengine.NewContext(r), network.Authorization(w, r), int64(duration.Minutes()))
 
 	data, err := json.Marshal(trip.TripResponse{
 		Points: int(points),

@@ -5,7 +5,6 @@ import (
 	"appengine/datastore"
 	"io"
 	"encoding/json"
-	"time"
 )
 
 type User struct {
@@ -16,7 +15,7 @@ type User struct {
 	Points          int64 `json:"points"`
 	AverageRating   float32 `json:"average_rating"`
 	RatingsCount    int64 `json:"ratings_count"`
-	DrivenTime      time.Duration `json:"driven_time"`
+	DrivenTime      int64 `json:"driven_time"`
 	Emissions       int64 `json:"emissions" datastore:"-"`
 	Token           string `json:"token"`
 	OfferedVehicles int64 `json:"offered_vehicles"`
@@ -76,7 +75,7 @@ func AddPoints(c appengine.Context, userId string, points int64) (*Points, error
 	return &Points{Points: user.Points}, nil
 }
 
-func AddDuration(c appengine.Context, userId string, duration time.Duration) error {
+func AddDuration(c appengine.Context, userId string, duration int64) error {
 	user, err := Get(c, userId)
 
 	if err != nil {
@@ -111,7 +110,7 @@ func Get(c appengine.Context, userId string) (*User, error) {
 	}
 
 	user.UserID = k.StringID()
-	user.Emissions = int64(float64(user.DrivenTime.Minutes()) * float64(106))
+	user.Emissions = int64(float64(user.DrivenTime) * float64(106))
 
 	return &user, nil
 }
@@ -231,5 +230,4 @@ func AddUsedVehicle(c appengine.Context, userId string) error {
 	user.UsedVehicles++
 
 	return user.save(c)
-
 }
