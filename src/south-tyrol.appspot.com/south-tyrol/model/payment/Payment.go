@@ -11,7 +11,7 @@ import (
 	"net/http"
 	"model/user"
 	"appengine/urlfetch"
-    "strconv"
+	"strconv"
 )
 
 type Payment struct {
@@ -76,29 +76,29 @@ func New(r *http.Request, vehicleId string) (*Payment, error) {
 
 func Accept(r *http.Request, vehicleId string) error {
 	c := appengine.NewContext(r)
-    payment := new(Payment)
+	payment := new(Payment)
 
-    if err := json.NewDecoder(r.Body).Decode(&payment); err != nil {
-        return err
-    }
+	if err := json.NewDecoder(r.Body).Decode(&payment); err != nil {
+		return err
+	}
 
-    orders := []order.Order{}
-    keys, err := datastore.NewQuery("Order").Filter("VehicleId =", vehicleId).GetAll(c, &orders)
+	orders := []order.Order{}
+	keys, err := datastore.NewQuery("Order").Filter("VehicleId =", vehicleId).GetAll(c, &orders)
 
-    if err != nil {
-        return err
-    }
+	if err != nil {
+		return err
+	}
 
-    orders[0].OrderId = keys[0].StringID()
-    v, err := vehicle.GetOne(c, r, orders[0].VehicleId)
+	orders[0].OrderId = keys[0].StringID()
+	v, err := vehicle.GetOne(c, r, vehicleId)
 
-    if err != nil {
-        return err
-    }
+	if err != nil {
+		return err
+	}
 
-    if v.QrCode != payment.QrCode {
-        return errors.New("QR codes do not match")
-    }
+	if v.QrCode != payment.QrCode {
+		return errors.New("QR codes do not match")
+	}
 
 	payment.Price = v.PricePerHour * (float64(time.Now().Hour()) - float64(orders[0].OrderDate.Hour()) + 1)
 
