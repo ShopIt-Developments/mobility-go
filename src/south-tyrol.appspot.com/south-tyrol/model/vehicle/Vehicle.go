@@ -56,6 +56,13 @@ func GetBooked(r *http.Request, userId string) ([]Vehicle, error) {
 
     for i := 0; i < len(vehicles); i++ {
         vehicles[i].VehicleId = keys[i].StringID()
+
+        file, err := storage.ReadFile(r, "images/vehicles/" + vehicles[i].VehicleId + ".txt")
+        if err != nil {
+            return nil, err
+        }
+
+        vehicles[i].Image = string(file)
     }
 
     return vehicles, nil
@@ -73,6 +80,13 @@ func GetMy(c appengine.Context, userId string) ([]Vehicle, error) {
 
     for i := 0; i < len(vehicles); i++ {
         vehicles[i].VehicleId = keys[i].StringID()
+
+        file, err := storage.ReadFile(r, "images/vehicles/" + vehicles[i].VehicleId + ".txt")
+        if err != nil {
+            return nil, err
+        }
+
+        vehicles[i].Image = string(file)
     }
 
     return vehicles, nil
@@ -111,13 +125,13 @@ func GetAll(r *http.Request) ([]Vehicle, error) {
     }
 
     for i := 0; i < len(vehicles); i++ {
-        file, err := storage.ReadFile(r, "images/vehicles/" + vehicles[i].VehicleId + ".txt")
+        vehicles[i].VehicleId = keys[i].StringID()
 
+        file, err := storage.ReadFile(r, "images/vehicles/" + vehicles[i].VehicleId + ".txt")
         if err != nil {
             return nil, err
         }
 
-        vehicles[i].VehicleId = keys[i].StringID()
         vehicles[i].Image = string(file)
     }
 
