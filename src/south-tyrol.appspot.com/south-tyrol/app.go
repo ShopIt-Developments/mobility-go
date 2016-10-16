@@ -10,15 +10,15 @@ import (
 func init() {
 	router := httprouter.New()
 
-    v := endpoint.Vehicle{Router: router}
-    v.Router.GET("/mobility/vehicles/available", v.GetAvailable)
-    v.Router.GET("/mobility/vehicles/booked", v.GetBooked)
-    v.Router.GET("/mobility/vehicles/my", v.GetMy)
-    v.Router.GET("/mobility/vehicles", v.GetAll)
-    v.Router.GET("/mobility/vehicle/:vehicle_id", v.GetOne)
-    v.Router.POST("/mobility/vehicle", v.New)
-    v.Router.PUT("/mobility/vehicles/:vehicle_id", v.Update)
-    v.Router.DELETE("/mobility/vehicle/:vehicle_id", v.Delete)
+	v := endpoint.Vehicle{Router: router}
+	v.Router.GET("/mobility/vehicles/available", v.GetAvailable)
+	v.Router.GET("/mobility/vehicles/booked", v.GetBooked)
+	v.Router.GET("/mobility/vehicles/my", v.GetMy)
+	v.Router.GET("/mobility/vehicles", v.GetAll)
+	v.Router.GET("/mobility/vehicle/:vehicle_id", v.GetOne)
+	v.Router.POST("/mobility/vehicle", v.New)
+	v.Router.PUT("/mobility/vehicles/:vehicle_id", v.Update)
+	v.Router.DELETE("/mobility/vehicle/:vehicle_id", v.Delete)
 
 	o := endpoint.Order{Router: router}
 	o.Router.POST("/mobility/order/:vehicle_id", o.New)
