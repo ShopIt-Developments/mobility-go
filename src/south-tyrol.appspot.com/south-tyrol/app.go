@@ -5,10 +5,10 @@ import (
 	"github.com/julienschmidt/httprouter"
 
 	"endpoint"
-    "model/user"
-    "appengine"
-    "issue"
-    "encoding/json"
+	"model/user"
+	"appengine"
+	"issue"
+	"encoding/json"
 )
 
 func init() {
@@ -61,14 +61,14 @@ func init() {
 	http.Handle("/", router)
 }
 
-func leaderboard(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-    w.Header().Set("Content-Type", "application/json")
+func leaderboard(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
 
-    users, err := user.GetAll(appengine.NewContext(r))
-    issue.Handle(w, err, http.StatusBadRequest)
+	users, err := user.GetAll(appengine.NewContext(r))
+	issue.Handle(w, err, http.StatusBadRequest)
 
-    data, err := json.Marshal(&users)
-    issue.Handle(w, err, http.StatusInternalServerError)
+	data, err := json.Marshal(&users)
+	issue.Handle(w, err, http.StatusInternalServerError)
 
-    w.Write(data)
+	w.Write(data)
 }
