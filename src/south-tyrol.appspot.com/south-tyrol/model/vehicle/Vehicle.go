@@ -145,6 +145,7 @@ func New(c appengine.Context, r *http.Request, userId string) (*Vehicle, error) 
         return nil, err
     }
 
+    vehicle.Available = true
     vehicle.Owner = userId
     vehicle.VehicleId = id.Alphanumeric()
     vehicle.Borrower = ""

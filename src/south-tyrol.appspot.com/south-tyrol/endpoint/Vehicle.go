@@ -11,6 +11,7 @@ import (
     "strconv"
     "strings"
     "network"
+    "storage"
 )
 
 type Vehicle struct {
@@ -130,6 +131,8 @@ func (*Vehicle) Update(w http.ResponseWriter, r *http.Request, p httprouter.Para
 
 func (*Vehicle) Delete(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
     w.Header().Set("Content-Type", "application/json")
+
+    storage.DeleteFile(r, "images/vehicles/" + p.ByName("vehicle_id") + ".txt")
 
     if _, err := vehicle.Delete(appengine.NewContext(r), r, p.ByName("vehicle_id")); err != nil {
         issue.Handle(w, err, http.StatusBadRequest)
