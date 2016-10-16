@@ -7,6 +7,7 @@ import (
     "id"
     "storage"
     "net/http"
+    "model/order"
 )
 
 type Vehicle struct {
@@ -43,7 +44,7 @@ func (vehicle *Vehicle) Save(c appengine.Context) error {
     return nil
 }
 
-/*func GetBooked(r *http.Request, userId string) ([]Vehicle, error) {
+func GetBooked(r *http.Request, userId string) ([]Vehicle, error) {
     c := appengine.NewContext(r)
 
     orders := []*order.Order{}
@@ -66,7 +67,7 @@ func (vehicle *Vehicle) Save(c appengine.Context) error {
     }
 
     return vehicles, nil
-}*/
+}
 
 func GetMy(c appengine.Context, userId string) ([]Vehicle, error) {
     q := datastore.NewQuery("Vehicle").Filter("Owner =", userId)

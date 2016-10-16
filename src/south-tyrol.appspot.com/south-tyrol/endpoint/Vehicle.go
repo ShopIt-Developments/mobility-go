@@ -17,7 +17,7 @@ type Vehicle struct {
     Router *httprouter.Router
 }
 
-/*func (*Vehicle) GetBooked(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+func (*Vehicle) GetBooked(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
     w.Header().Set("Content-Type", "application/json")
 
     vehicles, err := vehicle.GetBooked(r, network.Authorization(w, r))
@@ -27,7 +27,7 @@ type Vehicle struct {
     issue.Handle(w, err, http.StatusInternalServerError)
 
     w.Write(data)
-}*/
+}
 
 func (*Vehicle) GetAvailable(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
     w.Header().Set("Content-Type", "application/json")
