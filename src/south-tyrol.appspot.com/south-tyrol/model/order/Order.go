@@ -102,9 +102,6 @@ func Delete(r *http.Request, orderId string) (*Order, error) {
 	user.AddOfferedVehicle(c, v.Owner)
 	user.AddUsedVehicle(c, Order{}.UserId)
 
-	v.Available = true
-	v.QrCode = ""
-	v.Save(c)
     v.Borrower = ""
     v.QrCode = ""
     v.Save(c)
