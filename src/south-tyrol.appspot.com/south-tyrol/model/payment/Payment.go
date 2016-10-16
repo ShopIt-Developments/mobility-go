@@ -1,16 +1,16 @@
 package payment
 
 import (
-	"appengine"
-	"appengine/datastore"
-	"encoding/json"
-	"model/vehicle"
-	"model/order"
-	"errors"
-	"time"
-	"github.com/google/go-gcm"
-	"net/http"
-	"model/user"
+    "appengine"
+    "appengine/datastore"
+    "encoding/json"
+    "model/vehicle"
+    "model/order"
+    "errors"
+    "time"
+    "github.com/google/go-gcm"
+    "net/http"
+    "model/user"
 )
 
 const FCM_KEY = "AIzaSyALYozs9Jc2TqRUVW7uecvstoBiR6PXfbs"
@@ -71,56 +71,56 @@ func New(c appengine.Context, r *http.Request, orderId string) (*Payment, error)
 }
 
 func Accept(r *http.Request, orderId string, userId string) (error) {
-	c := appengine.NewContext(r)
-	Order, err := order.GetOne(c, orderId)
+    c := appengine.NewContext(r)
+    Order, err := order.GetOne(c, orderId)
 
-	if err != nil {
-		return err
-	}
+    if err != nil {
+        return err
+    }
 
-	Vehicle, err := vehicle.GetOne(c, r, Order.VehicleId)
+    Vehicle, err := vehicle.GetOne(c, r, Order.VehicleId)
 
-	if err != nil {
-		return err
-	}
+    if err != nil {
+        return err
+    }
 
-	owner, err := user.Get(c, Vehicle.Owner)
+    owner, err := user.Get(c, Vehicle.Owner)
 
-	if err != nil {
-		return err
-	}
+    if err != nil {
+        return err
+    }
 
-	User, err := user.Get(c, userId)
+    User, err := user.Get(c, userId)
 
-	if err != nil {
-		return err
-	}
+    if err != nil {
+        return err
+    }
 
-	d := gcm.Data{"data": map[string]string{"receiver": "action", "action": "payment_successful"}}
+    d := gcm.Data{"data": map[string]string{"receiver": "action", "action": "payment_successful"}}
 
-	_, err = gcm.SendHttp("AIzaSyALYozs9Jc2TqRUVW7uecvstoBiR6PXfbs", gcm.HttpMessage{To: owner.Token, Data:d})
-	_, err = gcm.SendHttp("AIzaSyALYozs9Jc2TqRUVW7uecvstoBiR6PXfbs", gcm.HttpMessage{To: User.Token, Data:d})
+    _, err = gcm.SendHttp("AIzaSyALYozs9Jc2TqRUVW7uecvstoBiR6PXfbs", gcm.HttpMessage{To: owner.Token, Data:d})
+    _, err = gcm.SendHttp("AIzaSyALYozs9Jc2TqRUVW7uecvstoBiR6PXfbs", gcm.HttpMessage{To: User.Token, Data:d})
 
-	return err
+    return err
 }
 
 func Notify(c appengine.Context, r *http.Request, orderId string) error {
-	var tokens []Token
+    var tokens []Token
 
-	if err := json.NewDecoder(r.Body).Decode(&tokens); err != nil {
-		return err
-	}
+    if err := json.NewDecoder(r.Body).Decode(&tokens); err != nil {
+        return err
+    }
 
-	o, _ := order.GetOne(c, orderId)
-	u, _ := user.Get(c, o.UserId)
-	v, _ := vehicle.GetOne(c, r, o.VehicleId)
-	d := gcm.Data{"data": map[string]string{"receiver": "action", "action": "payment_initiate", "username": u.Name, "qr_code": v.QrCode}}
+    o, _ := order.GetOne(c, orderId)
+    u, _ := user.Get(c, o.UserId)
+    v, _ := vehicle.GetOne(c, r, o.VehicleId)
+    d := gcm.Data{"data": map[string]string{"receiver": "action", "action": "payment_initiate", "username": u.Name, "qr_code": v.QrCode}}
 
-	var err error
+    var err error
 
-	for i := 0; i < len(tokens) && err == nil; i++ {
-		_, err = gcm.SendHttp(FCM_KEY, gcm.HttpMessage{To: tokens[i].Token, Data: d})
-	}
+    for i := 0; i < len(tokens) && err == nil; i++ {
+        _, err = gcm.SendHttp(FCM_KEY, gcm.HttpMessage{To: tokens[i].Token, Data: d})
+    }
 
-	return err
+    return err
 }

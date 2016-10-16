@@ -128,11 +128,12 @@ func GetAll(r *http.Request) ([]Vehicle, error) {
         vehicles[i].VehicleId = keys[i].StringID()
 
         file, err := storage.ReadFile(r, "images/vehicles/" + vehicles[i].VehicleId + ".txt")
-        if err != nil {
-            return nil, err
-        }
 
-        vehicles[i].Image = string(file)
+        if err != nil {
+            vehicles[i].Image = ""
+        } else {
+            vehicles[i].Image = string(file)
+        }
     }
 
     return vehicles, nil

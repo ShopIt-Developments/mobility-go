@@ -7,7 +7,6 @@ import (
     "issue"
     "encoding/json"
     "appengine"
-    "id"
     "network"
 )
 
@@ -33,7 +32,7 @@ func (*Order) New(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
     entity, err := order.New(appengine.NewContext(r), r, p.ByName("vehicle_id"), network.Authorization(w, r))
     issue.Handle(w, err, http.StatusBadRequest)
 
-    data, err := json.Marshal(id.Id{Id: entity.OrderId})
+    data, _ := json.Marshal(entity)
     issue.Handle(w, err, http.StatusInternalServerError)
 
     w.Write(data)

@@ -5,12 +5,17 @@ import (
 	"github.com/julienschmidt/httprouter"
 
 	"endpoint"
+    "model/user"
+    "appengine"
+    "issue"
+    "encoding/json"
 )
 
 func init() {
 	router := httprouter.New()
 
 	v := endpoint.Vehicle{Router: router}
+	v.Router.GET("/mobility/bus/:id", v.GetBus)
 	v.Router.GET("/mobility/vehicles/available", v.GetAvailable)
 	v.Router.GET("/mobility/vehicles/booked", v.GetBooked)
 	v.Router.GET("/mobility/vehicles/my", v.GetMy)
@@ -47,9 +52,23 @@ func init() {
 	t.Router.POST("/mobility/trip", t.New)
 
 	p := endpoint.Payment{Router: router}
-	p.Router.POST("/mobility/payments/scan/:order_id", p.Scan)
-	p.Router.POST("/mobility/payments/accept/:order_id", p.Accept)
-	p.Router.POST("/mobility/payments/notify/:order_id", p.Notify)
+	p.Router.POST("/mobility/payment/scan/:order_id", p.Scan)
+	p.Router.POST("/mobility/payment/accept/:order_id", p.Accept)
+	p.Router.POST("/mobility/payment/notify/:order_id", p.Notify)
+
+	router.GET("/mobility/leaderboard", leaderboard)
 
 	http.Handle("/", router)
+}
+
+func leaderboard(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+    w.Header().Set("Content-Type", "application/json")
+
+    users, err := user.GetAll(appengine.NewContext(r))
+    issue.Handle(w, err, http.StatusBadRequest)
+
+    data, err := json.Marshal(&users)
+    issue.Handle(w, err, http.StatusInternalServerError)
+
+    w.Write(data)
 }

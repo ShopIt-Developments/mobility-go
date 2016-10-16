@@ -30,6 +30,50 @@ func (*Vehicle) GetBooked(w http.ResponseWriter, r *http.Request, p httprouter.P
     w.Write(data)
 }
 
+func (*Vehicle) GetBus(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+    w.Header().Set("Content-Type", "application/json")
+
+    response := sasa.ReadJsonFromUrl(w, r, "http://realtimetest.opensasa.info/positions")
+
+    projection := new(sasa.Buses)
+    json.NewDecoder(response.Body).Decode(projection)
+
+    for _, bus := range projection.Features {
+        p := bus.Properties;
+
+        vehicleId, _ := strconv.Atoi(strings.Split(p.VehicleId, " ")[0]);
+
+        if strconv.Itoa(vehicleId) == ps.ByName("id") {
+            latitude, longitude := sasa.ToWgs84(bus.Geometry.Coordinates, 32)
+            variant, _ := strconv.Atoi(strings.Split(p.Variant, " ")[0])
+
+            hydrogen := vehicleId >= 428 && vehicleId <= 432
+            lineName := p.LineName
+
+            if hydrogen {
+                lineName = "Hydrogen bus: " + lineName
+            }
+
+            bus := sasa.RealtimeBus{
+                LineName: lineName,
+                LineId: p.LineId,
+                Variant: variant,
+                BusStop: p.BusStopName,
+                HydrogenBus: hydrogen,
+                TripId: strconv.Itoa(p.TripId),
+                Latitude: latitude,
+                Longitude: longitude,
+            }
+
+            data, _ := json.Marshal(bus)
+            w.Write(data)
+            return
+        }
+    }
+
+    w.WriteHeader(http.StatusBadRequest)
+}
+
 func (*Vehicle) GetAvailable(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
     w.Header().Set("Content-Type", "application/json")
 

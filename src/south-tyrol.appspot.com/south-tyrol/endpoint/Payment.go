@@ -43,6 +43,5 @@ func (*Payment) Accept(w http.ResponseWriter, r *http.Request, p httprouter.Para
 func (*Payment) Notify(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
     w.Header().Set("Content-Type", "application/json")
 
-    err := payment.Notify(appengine.NewContext(r), r, p.ByName("order_id"))
-    issue.Handle(w, err, http.StatusBadRequest)
+    payment.Notify(appengine.NewContext(r), r, p.ByName("order_id"))
 }
