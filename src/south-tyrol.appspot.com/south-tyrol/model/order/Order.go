@@ -66,7 +66,7 @@ func New(c appengine.Context, r *http.Request, vehicleId string, userId string) 
         return nil, err
     }
 
-    v.Available = false
+    v.Borrower = userId
     v.QrCode = id.Alphanumeric()
     v.Save(c)
 
@@ -98,7 +98,7 @@ func Delete(r *http.Request, orderId string) (*Order, error) {
         return nil, err
     }
 
-    v.Available = true
+    v.Borrower = ""
     v.QrCode = ""
     v.Save(c)
 

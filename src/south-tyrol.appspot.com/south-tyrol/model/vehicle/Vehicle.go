@@ -12,7 +12,7 @@ import (
 type Vehicle struct {
     Address      string `json:"address"`
     Availability string `json:"availability"`
-    Available    bool `json:"available"`
+    Borrower     string `json:"borrower"`
     Currency     string `json:"currency"`
     Description  string `json:"description"`
     VehicleId    string `json:"id" datastore:"-"`
@@ -41,6 +41,23 @@ func (vehicle *Vehicle) Save(c appengine.Context) error {
     vehicle.VehicleId = k.StringID()
 
     return nil
+}
+
+func GetBooked(r *http.Request, userId string) ([]Vehicle, error) {
+    q := datastore.NewQuery("Vehicle").Filter("Borrower =", userId)
+
+    vehicles := []Vehicle{}
+    keys, err := q.GetAll(appengine.NewContext(r), &vehicles)
+
+    if err != nil {
+        return nil, err
+    }
+
+    for i := 0; i < len(vehicles); i++ {
+        vehicles[i].VehicleId = keys[i].StringID()
+    }
+
+    return vehicles, nil
 }
 
 func GetMy(c appengine.Context, userId string) ([]Vehicle, error) {
@@ -83,7 +100,7 @@ func GetOne(c appengine.Context, r *http.Request, vehicleId string) (*Vehicle, e
 }
 
 func GetAll(r *http.Request) ([]Vehicle, error) {
-    q := datastore.NewQuery("Vehicle").Filter("Available =", true)
+    q := datastore.NewQuery("Vehicle").Filter("Borrower !=", "")
 
     vehicles := []Vehicle{}
     keys, err := q.GetAll(appengine.NewContext(r), &vehicles)
@@ -113,9 +130,9 @@ func New(c appengine.Context, r *http.Request, userId string) (*Vehicle, error) 
         return nil, err
     }
 
-    vehicle.Available = true
     vehicle.Owner = userId
     vehicle.VehicleId = id.Alphanumeric()
+    vehicle.Borrower = ""
     vehicle.QrCode = ""
 
     storage.WriteFile(r, "images/vehicles/" + vehicle.VehicleId + ".txt", vehicle.Image)
