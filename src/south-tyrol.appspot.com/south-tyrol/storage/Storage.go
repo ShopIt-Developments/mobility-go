@@ -53,3 +53,11 @@ func ReadFile(r *http.Request, fileName string) ([]byte, error) {
 
     return contents, nil
 }
+
+func DeleteFile(r *http.Request, fileName string) error {
+    ctx := appengine.NewContext(r)
+    client, _ := storage.NewClient(ctx)
+    bucket, _ := file.DefaultBucketName(ctx)
+
+    return client.Bucket(bucket).Object(fileName).Delete(ctx)
+}
