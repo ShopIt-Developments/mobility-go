@@ -75,7 +75,7 @@ func Accept(r io.ReadCloser) (error) {
 		return err
 	}
 
-	d := gcm.Data{"action": "successful"}
+	d := gcm.Data{"action": "payment-successful"}
 
 	var err error
 

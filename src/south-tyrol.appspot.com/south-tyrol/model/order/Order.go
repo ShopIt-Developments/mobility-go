@@ -1,20 +1,21 @@
 package order
 
 import (
-    "time"
-    "id"
-    "appengine/datastore"
-    "model/vehicle"
-    "appengine"
-    "net/http"
+	"time"
+	"id"
+	"appengine/datastore"
+	"model/vehicle"
+	"appengine"
+	"net/http"
+	"model/user"
 )
 
 type Order struct {
-    UserId     string `json:"user_id"`
-    VehicleId  string `json:"user_id"`
-    OrderId    string `json:"order_id" datastore:"-"`
-    OrderDate  time.Time `json:"order_date"`
-    BilledDate time.Time `json:"billed_at"`
+	UserId     string `json:"user_id"`
+	VehicleId  string `json:"vehicle_id"`
+	OrderId    string `json:"order_id" datastore:"-"`
+	OrderDate  time.Time `json:"order_date"`
+	BilledDate time.Time `json:"billed_at"`
 }
 
 func (order *Order) key(c appengine.Context) *datastore.Key {
@@ -98,6 +99,12 @@ func Delete(r *http.Request, orderId string) (*Order, error) {
         return nil, err
     }
 
+	user.AddOfferedVehicle(c, v.Owner)
+	user.AddUsedVehicle(c, Order{}.UserId)
+
+	v.Available = true
+	v.QrCode = ""
+	v.Save(c)
     v.Borrower = ""
     v.QrCode = ""
     v.Save(c)
