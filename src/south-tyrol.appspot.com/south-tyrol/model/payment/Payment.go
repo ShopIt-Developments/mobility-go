@@ -8,9 +8,9 @@ import (
     "model/order"
     "errors"
     "time"
-    "github.com/google/go-gcm"
     "net/http"
     "model/user"
+    "appengine/urlfetch"
 )
 
 const FCM_KEY = "AIzaSyALYozs9Jc2TqRUVW7uecvstoBiR6PXfbs"
@@ -38,7 +38,7 @@ func (payment *Payment) save(c appengine.Context) error {
     return nil
 }
 
-func New(c appengine.Context, r *http.Request, vehicleId string) (*Payment, error) {
+func New(w http.ResponseWriter, c appengine.Context, r *http.Request, vehicleId string) (*Payment, error) {
     payment := new(Payment)
 
     if err := json.NewDecoder(r.Body).Decode(&payment); err != nil {
@@ -72,7 +72,7 @@ func New(c appengine.Context, r *http.Request, vehicleId string) (*Payment, erro
     return payment, nil
 }
 
-func Accept(r *http.Request, vehicleId string, userId string) (error) {
+func Accept(w http.ResponseWriter, r *http.Request, vehicleId string, userId string) (error) {
     c := appengine.NewContext(r)
 
     Vehicle, err := vehicle.GetOne(c, r, vehicleId)
@@ -87,36 +87,28 @@ func Accept(r *http.Request, vehicleId string, userId string) (error) {
         return err
     }
 
-    User, err := user.Get(c, userId)
+    client := urlfetch.Client(c)
+    _, e := client.Get("https://sasa-bus.appspot.com/accept/" + owner.Token)
 
-    if err != nil {
-        return err
+    if e != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
     }
-
-    d := gcm.Data{"data": map[string]string{"receiver": "action", "action": "payment_successful"}}
-
-    _, err = gcm.SendHttp(FCM_KEY, gcm.HttpMessage{To: owner.Token, Data:d})
-    _, err = gcm.SendHttp(FCM_KEY, gcm.HttpMessage{To: User.Token, Data:d})
 
     return err
 }
 
-func Notify(c appengine.Context, r *http.Request, vehicleId string) error {
-    var tokens []Token
-
-    if err := json.NewDecoder(r.Body).Decode(&tokens); err != nil {
-        return err
-    }
-
+func Notify(w http.ResponseWriter, c appengine.Context, r *http.Request, vehicleId string) error {
     v, _ := vehicle.GetOne(c, r, vehicleId)
     u, _ := user.Get(c, v.Borrower)
-    d := gcm.Data{"data": map[string]string{"receiver": "action", "action": "payment_initiate", "username": u.Name, "qr_code": v.QrCode}}
 
-    var err error
+    client := urlfetch.Client(c)
+    _, e := client.Get("https://sasa-bus.appspot.com/accept/" + v.Owner + "/" + u.Name + "/" + v.QrCode)
 
-    for i := 0; i < len(tokens) && err == nil; i++ {
-        _, err = gcm.SendHttp(FCM_KEY, gcm.HttpMessage{To: tokens[i].Token, Data: d})
+    if e != nil {
+        http.Error(w, e.Error(), http.StatusInternalServerError)
+        return
     }
 
-    return err
+    return nil
 }

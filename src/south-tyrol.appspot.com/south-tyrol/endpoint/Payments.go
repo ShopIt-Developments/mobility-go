@@ -18,7 +18,7 @@ type Payments struct {
 func (*Payments) Scan(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	w.Header().Set("Content-Type", "application/json")
 
-	newPayment, err := payment.New(appengine.NewContext(r), r, p.ByName("order_id"))
+	newPayment, err := payment.New(w, appengine.NewContext(r), r, p.ByName("order_id"))
 	issue.Handle(w, err, http.StatusBadRequest)
 
 	data, err := json.Marshal(newPayment)
@@ -30,7 +30,7 @@ func (*Payments) Scan(w http.ResponseWriter, r *http.Request, p httprouter.Param
 func (*Payments) Accept(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	w.Header().Set("Content-Type", "application/json")
 
-	if err := payment.Accept(r, p.ByName("order_id"), network.Authorization(w, r)); err != nil {
+	if err := payment.Accept(w, r, p.ByName("order_id"), network.Authorization(w, r)); err != nil {
 		issue.Handle(w, err, http.StatusBadRequest)
 		return
 	}
