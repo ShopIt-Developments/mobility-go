@@ -8,6 +8,7 @@ import (
 	"model/payment"
 	"appengine"
 	"model/order"
+	"appengine/datastore"
 )
 
 type Payment struct {
@@ -34,7 +35,20 @@ func (*Payment) Accept(w http.ResponseWriter, r *http.Request, p httprouter.Para
 		return
 	}
 
-	if _, err := order.Delete(r, p.ByName("order_id")); err != nil {
+	q := datastore.NewQuery("Order").Filter("VehicleId =", p.ByName("vehicle_id"))
+
+	orders := []order.Order{}
+	keys, err := q.GetAll(appengine.NewContext(r), &orders)
+
+	if err != nil {
+		issue.Handle(w, err, http.StatusInternalServerError)
+	}
+
+	for i := 0; i < len(orders); i++ {
+		orders[i].OrderId = keys[i].StringID()
+	}
+
+	if _, err := order.Delete(r, orders[0].OrderId); err != nil {
 		issue.Handle(w, err, http.StatusInternalServerError)
 	}
 }
