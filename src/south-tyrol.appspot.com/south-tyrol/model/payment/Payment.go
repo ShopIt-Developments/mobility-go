@@ -78,7 +78,7 @@ func Accept(r io.ReadCloser) error {
         return err
     }
 
-    d := gcm.Data{"data": {"receiver": "action", "action" : "payment_successful"}}
+    d := gcm.Data{"data": {"receiver": "action", "action": "payment_successful"}}
 
     var err error
 
@@ -99,7 +99,7 @@ func Notify(c appengine.Context, r *http.Request, orderId string) error {
     o, _ := order.GetOne(c, orderId)
     u, _ := user.Get(c, o.UserId)
     v, _ := vehicle.GetOne(c, r, o.VehicleId)
-    d := gcm.Data{"receiver": "action", "action": "payment_initiated", "username": u.Name, "qr_code": v.QrCode}
+    d := gcm.Data{"data": {"receiver": "action", "action": "payment_initiate", "username": u.Name, "qr_code": v.QrCode}}
 
     var err error
 
