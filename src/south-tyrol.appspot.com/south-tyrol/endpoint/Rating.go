@@ -6,9 +6,9 @@ import (
 	"issue"
 	"encoding/json"
 	"appengine"
-	"errors"
 	"model/rating"
 	"strconv"
+	"network"
 )
 
 type Rating struct {
@@ -18,14 +18,7 @@ type Rating struct {
 func (*Rating) Add(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	w.Header().Set("Content-Type", "application/json")
 
-	userId := r.Header.Get("Authorization")
-
-	if userId == "" {
-		issue.Handle(w, errors.New("Unauthorized"), http.StatusUnauthorized)
-		return
-	}
-
-	entity, err := rating.New(appengine.NewContext(r), r.Body, userId)
+	entity, err := rating.New(appengine.NewContext(r), r.Body, network.Authorization(w, r))
 	issue.Handle(w, err, http.StatusBadRequest)
 
 	data, err := json.Marshal(entity)
@@ -41,6 +34,7 @@ func (*Rating) GetOne(w http.ResponseWriter, r *http.Request, p httprouter.Param
 
 	if err != nil {
 		issue.Handle(w, err, http.StatusNotFound)
+		return
 	}
 
 	entity, err := rating.GetOne(appengine.NewContext(r), ratingId)
@@ -55,14 +49,7 @@ func (*Rating) GetOne(w http.ResponseWriter, r *http.Request, p httprouter.Param
 func (*Rating) GetRatings(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	w.Header().Set("Content-Type", "application/json")
 
-	userId := r.Header.Get("Authorization")
-
-	if userId == "" {
-		issue.Handle(w, errors.New("Unauthorized"), http.StatusUnauthorized)
-		return
-	}
-
-	ratings, err := rating.GetRatings(appengine.NewContext(r), userId)
+	ratings, err := rating.GetRatings(appengine.NewContext(r), network.Authorization(w, r))
 	issue.Handle(w, err, http.StatusBadRequest)
 
 	data, err := json.Marshal(ratings)
@@ -74,14 +61,7 @@ func (*Rating) GetRatings(w http.ResponseWriter, r *http.Request, p httprouter.P
 func (*Rating) GetRated(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	w.Header().Set("Content-Type", "application/json")
 
-	userId := r.Header.Get("Authorization")
-
-	if userId == "" {
-		issue.Handle(w, errors.New("Unauthorized"), http.StatusUnauthorized)
-		return
-	}
-
-	ratings, err := rating.GetRated(appengine.NewContext(r), userId)
+	ratings, err := rating.GetRated(appengine.NewContext(r), network.Authorization(w, r))
 	issue.Handle(w, err, http.StatusBadRequest)
 
 	data, err := json.Marshal(ratings)

@@ -10,6 +10,7 @@ import (
 
 	"errors"
 	"strconv"
+	"network"
 )
 
 type User struct {
@@ -19,14 +20,7 @@ type User struct {
 func (*User) Get(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	w.Header().Set("Content-Type", "application/json")
 
-	userId := r.Header.Get("Authorization")
-
-	if userId == "" {
-		issue.Handle(w, errors.New(http.StatusText(http.StatusUnauthorized)), http.StatusUnauthorized)
-		return
-	}
-
-	entity, err := user.Get(appengine.NewContext(r), userId)
+	entity, err := user.Get(appengine.NewContext(r), network.Authorization(w, r))
 	issue.Handle(w, err, http.StatusBadRequest)
 
 	data, err := json.Marshal(entity)
@@ -38,14 +32,7 @@ func (*User) Get(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 func (*User) Add(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	w.Header().Set("Content-Type", "application/json")
 
-	userID := r.Header.Get("Authorization")
-
-	if userID == "" {
-		issue.Handle(w, errors.New(http.StatusText(http.StatusUnauthorized)), http.StatusUnauthorized)
-		return
-	}
-
-	entity, err := user.New(appengine.NewContext(r), r.Body, userID)
+	entity, err := user.New(appengine.NewContext(r), r.Body, network.Authorization(w, r))
 	issue.Handle(w, err, http.StatusBadRequest)
 
 	data, err := json.Marshal(entity)
@@ -56,13 +43,6 @@ func (*User) Add(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 
 func (*User) AddPoints(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	w.Header().Set("Content-Type", "application/json")
-
-	userId := r.Header.Get("Authorization")
-
-	if userId == "" {
-		issue.Handle(w, errors.New(http.StatusText(http.StatusUnauthorized)), http.StatusUnauthorized)
-		return
-	}
 
 	points, err := strconv.ParseInt(p.ByName("points"), 10, 64)
 
@@ -76,7 +56,7 @@ func (*User) AddPoints(w http.ResponseWriter, r *http.Request, p httprouter.Para
 		return
 	}
 
-	entity, err := user.AddPoints(appengine.NewContext(r), userId, points)
+	entity, err := user.AddPoints(appengine.NewContext(r), network.Authorization(w, r), points)
 	issue.Handle(w, err, http.StatusBadRequest)
 
 	data, err := json.Marshal(entity)
@@ -88,14 +68,7 @@ func (*User) AddPoints(w http.ResponseWriter, r *http.Request, p httprouter.Para
 func (*User) GetPoints(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	w.Header().Set("Content-Type", "application/json")
 
-	userId := r.Header.Get("Authorization")
-
-	if userId == "" {
-		issue.Handle(w, errors.New(http.StatusText(http.StatusUnauthorized)), http.StatusUnauthorized)
-		return
-	}
-
-	entity, err := user.GetPoints(appengine.NewContext(r), userId)
+	entity, err := user.GetPoints(appengine.NewContext(r), network.Authorization(w, r))
 	issue.Handle(w, err, http.StatusBadRequest)
 
 	data, err := json.Marshal(entity)
@@ -107,14 +80,7 @@ func (*User) GetPoints(w http.ResponseWriter, r *http.Request, p httprouter.Para
 func (*User) Update(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	w.Header().Set("Content-Type", "application/json")
 
-	userId := r.Header.Get("Authorization")
-
-	if userId == "" {
-		issue.Handle(w, errors.New(http.StatusText(http.StatusUnauthorized)), http.StatusUnauthorized)
-		return
-	}
-
-	if _, err := user.Update(appengine.NewContext(r), userId, r.Body); err != nil {
+	if _, err := user.Update(appengine.NewContext(r), network.Authorization(w, r), r.Body); err != nil {
 		issue.Handle(w, err, http.StatusBadRequest)
 	}
 
@@ -124,14 +90,17 @@ func (*User) Update(w http.ResponseWriter, r *http.Request, p httprouter.Params)
 func (*User) Delete(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	w.Header().Set("Content-Type", "application/json")
 
-	userId := r.Header.Get("Authorization")
-
-	if userId == "" {
-		issue.Handle(w, errors.New(http.StatusText(http.StatusUnauthorized)), http.StatusUnauthorized)
-		return
+	if _, err := user.Delete(appengine.NewContext(r), network.Authorization(w, r)); err != nil {
+		issue.Handle(w, err, http.StatusBadRequest)
 	}
 
-	if _, err := user.Delete(appengine.NewContext(r), userId); err != nil {
+	w.WriteHeader(http.StatusNoContent)
+}
+
+func (*User) SetToken(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	w.Header().Set("Content-Type", "application/json")
+
+	if err := user.SetToken(appengine.NewContext(r), network.Authorization(w, r), p.ByName("token")); err != nil {
 		issue.Handle(w, err, http.StatusBadRequest)
 	}
 

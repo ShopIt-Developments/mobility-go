@@ -5,16 +5,22 @@ import (
 	"appengine/datastore"
 	"io"
 	"encoding/json"
+	"time"
 )
 
 type User struct {
-	UserID        string `json:"user_id" datastore:"-"`
-	Name          string `json:"name"`
-	Address       string `json:"address"`
-	Telephone     string `json:"telephone"`
-	Points        int64 `json:"points"`
-	AverageRating float32 `json:"average_rating"`
-	RatingsCount  int64`json:"ratings_count"`
+	UserID          string `json:"user_id" datastore:"-"`
+	Name            string `json:"name"`
+	Address         string `json:"address"`
+	Telephone       string `json:"telephone"`
+	Points          int64 `json:"points"`
+	AverageRating   float32 `json:"average_rating"`
+	RatingsCount    int64 `json:"ratings_count"`
+	DrivenTime      time.Duration `json:"driven_time"`
+	Emissions       int64 `json:"emissions" datastore:"-"`
+	Token           string `json:"token"`
+	OfferedVehicles int64 `json:"offered_vehicles"`
+	UsedVehicles    int64 `json:"used_vehicles"`
 }
 
 func (user *User) key(c appengine.Context) *datastore.Key {
@@ -70,6 +76,20 @@ func AddPoints(c appengine.Context, userId string, points int64) (*Points, error
 	return &Points{Points: user.Points}, nil
 }
 
+func AddDuration(c appengine.Context, userId string, duration time.Duration) error {
+	user, err := Get(c, userId)
+
+	if err != nil {
+		return err
+	}
+
+	user.DrivenTime = user.DrivenTime + duration
+
+	user.save(c)
+
+	return err
+}
+
 func GetPoints(c appengine.Context, userId string) (*Points, error) {
 	user, err := Get(c, userId)
 
@@ -91,6 +111,7 @@ func Get(c appengine.Context, userId string) (*User, error) {
 	}
 
 	user.UserID = k.StringID()
+	user.Emissions = int64(float64(user.DrivenTime.Minutes()) * float64(106))
 
 	return &user, nil
 }
@@ -173,3 +194,42 @@ func DeleteRating(c appengine.Context, userID string, rating int8) error {
 	return err
 }
 
+func SetToken(c appengine.Context, userId string, token string) error {
+	user, err := Get(c, userId)
+
+	if err != nil {
+		return err
+	}
+
+	user.Token = token
+
+	return user.save(c)
+
+	return err
+}
+
+func AddOfferedVehicle(c appengine.Context, userId string) error {
+	user, err := Get(c, userId)
+
+	if err != nil {
+		return err
+	}
+
+	user.OfferedVehicles++
+
+	return user.save(c)
+
+}
+
+func AddUsedVehicle(c appengine.Context, userId string) error {
+	user, err := Get(c, userId)
+
+	if err != nil {
+		return err
+	}
+
+	user.UsedVehicles++
+
+	return user.save(c)
+
+}

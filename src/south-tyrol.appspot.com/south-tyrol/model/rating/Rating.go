@@ -102,6 +102,7 @@ func New(c appengine.Context, r io.ReadCloser, raterId string) (*Rating, error) 
 	}
 
 	rating.RaterId = raterId
+	rating.Date = time.Now()
 
 	user.NewRating(c, rating.RatedId, rating.Rating)
 

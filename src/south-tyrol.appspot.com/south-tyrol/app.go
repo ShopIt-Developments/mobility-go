@@ -20,9 +20,9 @@ func init() {
     v.Router.PUT("/mobility/vehicles/:vehicle_id", v.Update)
     v.Router.DELETE("/mobility/vehicle/:vehicle_id", v.Delete)
 
-    o := endpoint.Order{Router: router}
-    o.Router.POST("/mobility/order/:vehicle_id", o.New)
-    o.Router.DELETE("/mobility/order/:order_id", o.Delete)
+	o := endpoint.Order{Router: router}
+	o.Router.POST("/mobility/order/:vehicle_id", o.New)
+	o.Router.DELETE("/mobility/order/:order_id", o.Delete)
 
 	u := endpoint.User{Router: router}
 	u.Router.GET("/mobility/user", u.Get)
@@ -33,16 +33,18 @@ func init() {
 	u.Router.GET("/mobility/points", u.GetPoints)
 	u.Router.POST("/mobility/points/:points", u.AddPoints)
 
+	u.Router.PATCH("/mobility/token/:token", u.SetToken)
+
 	r := endpoint.Rating{Router: router}
 	r.Router.GET("/mobility/ratings", r.GetRatings)
 	r.Router.GET("/mobility/ratings/:rating_id", r.GetOne)
 	r.Router.GET("/mobility/rated", r.GetRated)
-	r.Router.POST("/mobility/rating", r.Add)
+	r.Router.POST("/mobility/ratings", r.Add)
 	r.Router.PUT("/mobility/ratings/:rating_id", r.Update)
-	r.Router.DELETE("/mobility/rating/:rating_id", r.Delete)
+	r.Router.DELETE("/mobility/ratings/:rating_id", r.Delete)
 
-    t := endpoint.Trip{Router: router}
-    t.Router.POST("/mobility/trip", t.New)
+	t := endpoint.Trip{Router: router}
+	t.Router.POST("/mobility/trip", t.New)
 
 	p := endpoint.Payments{Router: router}
 	p.Router.POST("/mobility/payments/scan/:order_id", p.Scan)
