@@ -48,7 +48,7 @@ func (*Vehicle) GetBus(w http.ResponseWriter, r *http.Request, ps httprouter.Par
             variant, _ := strconv.Atoi(strings.Split(p.Variant, " ")[0])
 
             hydrogen := vehicleId >= 428 && vehicleId <= 432
-            lineName := p.LineName
+            lineName := "10A"
 
             if hydrogen {
                 lineName = "Hydrogen bus: " + lineName

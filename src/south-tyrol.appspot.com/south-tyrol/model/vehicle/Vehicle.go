@@ -179,18 +179,12 @@ func Update(c appengine.Context, vehicleId string, r *http.Request) (*Vehicle, e
     return vehicle, nil
 }
 
-func Delete(c appengine.Context, r *http.Request, id string) (*Vehicle, error) {
-    vehicle, err := GetOne(c, r, id)
+func Delete(c appengine.Context, r *http.Request, vehicleId string) (*Vehicle, error) {
+    vehicle := Vehicle{VehicleId: vehicleId}
 
-    if err != nil {
+    if err := datastore.Delete(c, vehicle.key(c)); err != nil {
         return nil, err
     }
 
-    err = datastore.Delete(c, vehicle.key(c))
-
-    if err != nil {
-        return nil, err
-    }
-
-    return vehicle, nil
+    return &vehicle, nil
 }

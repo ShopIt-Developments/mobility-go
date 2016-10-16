@@ -61,7 +61,7 @@ func init() {
 	http.Handle("/", router)
 }
 
-func leaderboard(w http.ResponseWriter, r *http.Request) {
+func leaderboard(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	w.Header().Set("Content-Type", "application/json")
 
 	users, err := user.GetAll(appengine.NewContext(r))
