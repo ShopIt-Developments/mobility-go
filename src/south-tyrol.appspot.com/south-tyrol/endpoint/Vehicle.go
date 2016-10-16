@@ -91,13 +91,19 @@ func (*Vehicle) GetAvailable(w http.ResponseWriter, r *http.Request, p httproute
         vehicleId, _ := strconv.Atoi(strings.Split(p.VehicleId, " ")[0]);
         latitude, longitude := sasa.ToWgs84(bus.Geometry.Coordinates, 32)
         variant, _ := strconv.Atoi(strings.Split(p.Variant, " ")[0])
+        hydrogen := vehicleId >= 428 && vehicleId <= 432
+        linename := "10A"
+
+        if hydrogen {
+            linename = "Hydrogen bus: 10A"
+        }
 
         buses[key] = sasa.RealtimeBus{
-            LineName: p.LineName,
+            LineName: linename,
             LineId: p.LineId,
             Variant: variant,
             BusStop: p.BusStopName,
-            HydrogenBus: vehicleId >= 428 && vehicleId <= 432,
+            HydrogenBus: hydrogen,
             TripId: strconv.Itoa(p.TripId),
             Latitude: latitude,
             Longitude: longitude,

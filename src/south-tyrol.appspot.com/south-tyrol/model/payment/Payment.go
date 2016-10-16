@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"model/user"
 	"appengine/urlfetch"
+    "strconv"
 )
 
 type Payment struct {
@@ -73,26 +74,26 @@ func New(r *http.Request, vehicleId string) (*Payment, error) {
 	return payment, nil
 }
 
-func Accept(r *http.Request, vehicleId string) (error) {
+func Accept(r *http.Request, vehicleId string) error {
 	c := appengine.NewContext(r)
     payment := new(Payment)
 
     if err := json.NewDecoder(r.Body).Decode(&payment); err != nil {
-        return nil, err
+        return err
     }
 
     orders := []order.Order{}
     keys, err := datastore.NewQuery("Order").Filter("VehicleId =", vehicleId).GetAll(c, &orders)
 
     if err != nil {
-        return nil, err
+        return err
     }
 
     orders[0].OrderId = keys[0].StringID()
     v, err := vehicle.GetOne(c, r, orders[0].VehicleId)
 
     if err != nil {
-        return nil, err
+        return err
     }
 
     if v.QrCode != payment.QrCode {
@@ -113,7 +114,7 @@ func Accept(r *http.Request, vehicleId string) (error) {
 		return err
 	}
 
-	_, e := urlfetch.Client(c).Get("https://sasa-bus.appspot.com/accept/" + owner.Token + "/" + payment.Price)
+	_, e := urlfetch.Client(c).Get("https://sasa-bus.appspot.com/accept/" + owner.Token + "/" + strconv.FormatFloat(payment.Price, 'f', 6, 64))
 
 	return e
 }
