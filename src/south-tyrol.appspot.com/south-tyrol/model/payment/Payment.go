@@ -65,7 +65,7 @@ func New(r *http.Request, vehicleId string) (*Payment, error) {
 		return nil, errors.New("QR codes do not match")
 	}
 
-	payment.Price = v.PricePerHour * (float64(time.Now().Hour()) - float64(Order.OrderDate.Hour() + 1))
+	payment.Price = v.PricePerHour * (float64(time.Now().Unix()) - float64(Order.OrderDate.Unix())) / float64(3600)
 
 	if err := payment.save(c); err != nil {
 		return nil, err
@@ -78,9 +78,11 @@ func Accept(r *http.Request, vehicleId string) error {
 	c := appengine.NewContext(r)
 	payment := new(Payment)
 
-	if err := json.NewDecoder(r.Body).Decode(&payment); err != nil {
-		return err
-	}
+    v, err := vehicle.GetOne(c, r, vehicleId)
+
+    if err != nil {
+        return err
+    }
 
 	orders := []order.Order{}
 	keys, err := datastore.NewQuery("Order").Filter("VehicleId =", vehicleId).GetAll(c, &orders)
@@ -89,26 +91,19 @@ func Accept(r *http.Request, vehicleId string) error {
 		return err
 	}
 
-	orders[0].OrderId = keys[0].StringID()
-	v, err := vehicle.GetOne(c, r, vehicleId)
+    Order := orders[0]
+	Order.OrderId = keys[0].StringID()
 
-	if err != nil {
-		return err
-	}
+    payment.OrderId = Order.OrderId
+    payment.PaymentType = "credit_card"
 
 	if v.QrCode != payment.QrCode {
 		return errors.New("QR codes do not match")
 	}
 
-	payment.Price = v.PricePerHour * (float64(time.Now().Hour()) - float64(orders[0].OrderDate.Hour()) + 1)
+    payment.Price = v.PricePerHour * (float64(time.Now().Unix()) - float64(Order.OrderDate.Unix())) / float64(3600)
 
-	Vehicle, err := vehicle.GetOne(c, r, vehicleId)
-
-	if err != nil {
-		return err
-	}
-
-	owner, err := user.Get(c, Vehicle.Owner)
+	owner, err := user.Get(c, v.Owner)
 
 	if err != nil {
 		return err
@@ -119,8 +114,9 @@ func Accept(r *http.Request, vehicleId string) error {
 	return e
 }
 
-func Notify(c appengine.Context, r *http.Request, vehicleId string) error {
-	v, _ := vehicle.GetOne(c, r, vehicleId)
+func Notify(r *http.Request, vehicleId string) error {
+	c := appengine.NewContext(r)
+    v, _ := vehicle.GetOne(c, r, vehicleId)
 	u, _ := user.Get(c, v.Borrower)
 
 	owner, err := user.Get(c, v.Owner)

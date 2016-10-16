@@ -56,5 +56,5 @@ func (*Payment) Accept(w http.ResponseWriter, r *http.Request, p httprouter.Para
 func (*Payment) Notify(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	w.Header().Set("Content-Type", "application/json")
 
-	payment.Notify(appengine.NewContext(r), r, p.ByName("vehicle_id"))
+	payment.Notify(r, p.ByName("vehicle_id"))
 }
