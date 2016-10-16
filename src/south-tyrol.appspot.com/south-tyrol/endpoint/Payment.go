@@ -8,6 +8,7 @@ import (
     "model/payment"
     "appengine"
     "model/order"
+    "network"
 )
 
 type Payment struct {
@@ -29,7 +30,7 @@ func (*Payment) Scan(w http.ResponseWriter, r *http.Request, p httprouter.Params
 func (*Payment) Accept(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
     w.Header().Set("Content-Type", "application/json")
 
-    if err := payment.Accept(r.Body); err != nil {
+    if err := payment.Accept(r, p.ByName("order_id"), network.Authorization(w, r)); err != nil {
         issue.Handle(w, err, http.StatusBadRequest)
         return
     }
