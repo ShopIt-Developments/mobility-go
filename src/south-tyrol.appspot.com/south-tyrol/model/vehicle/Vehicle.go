@@ -7,7 +7,6 @@ import (
     "id"
     "storage"
     "net/http"
-    "model/order"
 )
 
 type Vehicle struct {
@@ -42,31 +41,6 @@ func (vehicle *Vehicle) Save(c appengine.Context) error {
     vehicle.VehicleId = k.StringID()
 
     return nil
-}
-
-func GetBooked(r *http.Request, userId string) ([]Vehicle, error) {
-    c := appengine.NewContext(r)
-
-    orders := []*order.Order{}
-    _, err := datastore.NewQuery("Order").Filter("UserId =", userId).GetAll(c, &orders)
-
-    if err != nil {
-        return nil, err
-    }
-
-    keys := make([]*datastore.Key, len(orders))
-
-    for i := 0; i < len(orders); i++ {
-        keys = datastore.NewKey(c, "Vehicle", orders[i].VehicleId, 0, nil);
-    }
-
-    vehicles := []*Vehicle{}
-
-    if err := datastore.GetMulti(c, &keys, &vehicles); err != nil {
-        return nil, err
-    }
-
-    return vehicles, nil
 }
 
 func GetMy(c appengine.Context, userId string) ([]Vehicle, error) {

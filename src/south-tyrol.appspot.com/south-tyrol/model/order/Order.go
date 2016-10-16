@@ -48,6 +48,17 @@ func GetOne(c appengine.Context, orderId string) (*Order, error) {
     return &order, nil
 }
 
+/*func GetMulti(c appengine.Context, userId string) (*[]Order, error) {
+    orders := []Order{}
+    _, err := datastore.NewQuery("Order").Filter("UserId =", userId).GetAll(c, &orders)
+
+    if err != nil {
+        return nil, err
+    }
+
+    return orders, nil
+}*/
+
 func New(c appengine.Context, r *http.Request, vehicleId string, userId string) (*Order, error) {
     v, err := vehicle.GetOne(c, r, vehicleId)
 

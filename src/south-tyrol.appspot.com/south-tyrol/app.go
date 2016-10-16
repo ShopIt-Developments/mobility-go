@@ -12,7 +12,7 @@ func init() {
 
     v := endpoint.Vehicle{Router: router}
     v.Router.GET("/mobility/vehicles/available", v.GetAvailable)
-    v.Router.GET("/mobility/vehicles/booked", v.GetBooked)
+    //v.Router.GET("/mobility/vehicles/booked", v.GetBooked)
     v.Router.GET("/mobility/vehicles/my", v.GetMy)
     v.Router.GET("/mobility/vehicles", v.GetAll)
     v.Router.GET("/mobility/vehicle/:vehicle_id", v.GetOne)
