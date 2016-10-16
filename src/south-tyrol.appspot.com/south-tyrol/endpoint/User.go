@@ -102,6 +102,7 @@ func (*User) SetToken(w http.ResponseWriter, r *http.Request, p httprouter.Param
 
 	if err := user.SetToken(appengine.NewContext(r), network.Authorization(w, r), p.ByName("token")); err != nil {
 		issue.Handle(w, err, http.StatusBadRequest)
+		return
 	}
 
 	w.WriteHeader(http.StatusNoContent)
