@@ -95,7 +95,7 @@ func (*Vehicle) GetAvailable(w http.ResponseWriter, r *http.Request, p httproute
         linename := "10A"
 
         if hydrogen {
-            linename = "Hydrogen bus: 10A"
+            p.BusStopName = "Hydrogen bus; " + p.BusStopName
         }
 
         buses[key] = sasa.RealtimeBus{
