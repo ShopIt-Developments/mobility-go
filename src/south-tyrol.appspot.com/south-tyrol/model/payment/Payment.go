@@ -98,8 +98,8 @@ func Accept(r *http.Request, orderId string, userId string) (error) {
 
     d := gcm.Data{"data": map[string]string{"receiver": "action", "action": "payment_successful"}}
 
-    _, err = gcm.SendHttp("AIzaSyALYozs9Jc2TqRUVW7uecvstoBiR6PXfbs", gcm.HttpMessage{To: owner.Token, Data:d})
-    _, err = gcm.SendHttp("AIzaSyALYozs9Jc2TqRUVW7uecvstoBiR6PXfbs", gcm.HttpMessage{To: User.Token, Data:d})
+    _, err = gcm.SendHttp(FCM_KEY, gcm.HttpMessage{To: owner.Token, Data:d})
+    _, err = gcm.SendHttp(FCM_KEY, gcm.HttpMessage{To: User.Token, Data:d})
 
     return err
 }
