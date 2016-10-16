@@ -30,7 +30,7 @@ func (*Trip) New(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 
 	data, err := json.Marshal(trip.TripResponse{
 		Points: int(points),
-		Duration: duration.String(),
+		Duration: int(duration.Seconds()),
 	})
 
 	issue.Handle(w, err, http.StatusInternalServerError)

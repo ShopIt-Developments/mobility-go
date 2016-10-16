@@ -34,6 +34,7 @@ func (*Payments) Accept(w http.ResponseWriter, r *http.Request, p httprouter.Par
 		issue.Handle(w, err, http.StatusBadRequest)
 		return
 	}
+
 	_, err = order.Delete(appengine.NewContext(r), p.ByName("order_id"))
 	if err != nil {
 		issue.Handle(w, err, http.StatusInternalServerError)
