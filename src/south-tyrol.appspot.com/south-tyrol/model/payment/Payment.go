@@ -75,6 +75,31 @@ func New(r *http.Request, vehicleId string) (*Payment, error) {
 
 func Accept(r *http.Request, vehicleId string) (error) {
 	c := appengine.NewContext(r)
+    payment := new(Payment)
+
+    if err := json.NewDecoder(r.Body).Decode(&payment); err != nil {
+        return nil, err
+    }
+
+    orders := []order.Order{}
+    keys, err := datastore.NewQuery("Order").Filter("VehicleId =", vehicleId).GetAll(c, &orders)
+
+    if err != nil {
+        return nil, err
+    }
+
+    orders[0].OrderId = keys[0].StringID()
+    v, err := vehicle.GetOne(c, r, orders[0].VehicleId)
+
+    if err != nil {
+        return nil, err
+    }
+
+    if v.QrCode != payment.QrCode {
+        return nil, errors.New("QR codes do not match")
+    }
+
+    payment.Price = v.PricePerHour * (float64(time.Now().Unix()) - float64(orders[0].OrderDate.Unix()) / float64(3600))
 
 	Vehicle, err := vehicle.GetOne(c, r, vehicleId)
 
@@ -88,7 +113,7 @@ func Accept(r *http.Request, vehicleId string) (error) {
 		return err
 	}
 
-	_, e := urlfetch.Client(c).Get("https://sasa-bus.appspot.com/accept/" + owner.Token)
+	_, e := urlfetch.Client(c).Get("https://sasa-bus.appspot.com/accept/" + owner.Token + "/" + payment.Price)
 
 	return e
 }
