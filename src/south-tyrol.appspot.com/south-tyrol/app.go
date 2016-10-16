@@ -52,9 +52,9 @@ func init() {
 	t.Router.POST("/mobility/trip", t.New)
 
 	p := endpoint.Payment{Router: router}
-	p.Router.POST("/mobility/payment/scan/:order_id", p.Scan)
-	p.Router.POST("/mobility/payment/accept/:order_id", p.Accept)
-	p.Router.POST("/mobility/payment/notify/:order_id", p.Notify)
+	p.Router.POST("/mobility/payment/scan/:vehicle_id", p.Scan)
+	p.Router.POST("/mobility/payment/accept/:vehicle_id", p.Accept)
+	p.Router.POST("/mobility/payment/notify/:vehicle_id", p.Notify)
 
 	router.GET("/mobility/leaderboard", leaderboard)
 

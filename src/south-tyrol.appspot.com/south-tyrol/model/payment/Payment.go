@@ -38,30 +38,32 @@ func (payment *Payment) save(c appengine.Context) error {
     return nil
 }
 
-func New(c appengine.Context, r *http.Request, orderId string) (*Payment, error) {
+func New(c appengine.Context, r *http.Request, vehicleId string) (*Payment, error) {
     payment := new(Payment)
 
     if err := json.NewDecoder(r.Body).Decode(&payment); err != nil {
         return nil, err
     }
 
-    o, err := order.GetOne(c, orderId)
+    orders := []order.Order{}
+    keys, err := datastore.NewQuery("Order").Filter("UserId =", vehicleId).GetAll(c, &orders)
 
     if err != nil {
         return nil, err
     }
 
-    v, err := vehicle.GetOne(c, r, o.VehicleId)
+    orders[0].OrderId = keys[0].StringID()
+    v, err := vehicle.GetOne(c, r, orders[0].VehicleId)
 
     if err != nil {
         return nil, err
     }
 
     if v.QrCode != payment.QrCode {
-        return nil, errors.New("Qr-Codes do not match!")
+        return nil, errors.New("QR codes do not match")
     }
 
-    payment.Price = v.PricePerHour * (float64(time.Now().Unix()) - float64(o.BilledDate.Unix()) / float64(3600))
+    payment.Price = v.PricePerHour * (float64(time.Now().Unix()) - float64(orders[0].OrderDate.Unix()) / float64(3600))
 
     if err := payment.save(c); err != nil {
         return nil, err
@@ -70,15 +72,10 @@ func New(c appengine.Context, r *http.Request, orderId string) (*Payment, error)
     return payment, nil
 }
 
-func Accept(r *http.Request, orderId string, userId string) (error) {
+func Accept(r *http.Request, vehicleId string, userId string) (error) {
     c := appengine.NewContext(r)
-    Order, err := order.GetOne(c, orderId)
 
-    if err != nil {
-        return err
-    }
-
-    Vehicle, err := vehicle.GetOne(c, r, Order.VehicleId)
+    Vehicle, err := vehicle.GetOne(c, r, vehicleId)
 
     if err != nil {
         return err
@@ -104,16 +101,15 @@ func Accept(r *http.Request, orderId string, userId string) (error) {
     return err
 }
 
-func Notify(c appengine.Context, r *http.Request, orderId string) error {
+func Notify(c appengine.Context, r *http.Request, vehicleId string) error {
     var tokens []Token
 
     if err := json.NewDecoder(r.Body).Decode(&tokens); err != nil {
         return err
     }
 
-    o, _ := order.GetOne(c, orderId)
-    u, _ := user.Get(c, o.UserId)
-    v, _ := vehicle.GetOne(c, r, o.VehicleId)
+    v, _ := vehicle.GetOne(c, r, vehicleId)
+    u, _ := user.Get(c, v.Borrower)
     d := gcm.Data{"data": map[string]string{"receiver": "action", "action": "payment_initiate", "username": u.Name, "qr_code": v.QrCode}}
 
     var err error

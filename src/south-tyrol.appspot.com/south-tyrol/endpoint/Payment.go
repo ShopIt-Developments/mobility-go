@@ -18,7 +18,7 @@ type Payment struct {
 func (*Payment) Scan(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
     w.Header().Set("Content-Type", "application/json")
 
-    newPayment, err := payment.New(appengine.NewContext(r), r, p.ByName("order_id"))
+    newPayment, err := payment.New(appengine.NewContext(r), r, p.ByName("vehicle_id"))
     issue.Handle(w, err, http.StatusBadRequest)
 
     data, err := json.Marshal(newPayment)
@@ -30,7 +30,7 @@ func (*Payment) Scan(w http.ResponseWriter, r *http.Request, p httprouter.Params
 func (*Payment) Accept(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
     w.Header().Set("Content-Type", "application/json")
 
-    if err := payment.Accept(r, p.ByName("order_id"), network.Authorization(w, r)); err != nil {
+    if err := payment.Accept(r, p.ByName("vehicle_id"), network.Authorization(w, r)); err != nil {
         issue.Handle(w, err, http.StatusBadRequest)
         return
     }
@@ -43,5 +43,5 @@ func (*Payment) Accept(w http.ResponseWriter, r *http.Request, p httprouter.Para
 func (*Payment) Notify(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
     w.Header().Set("Content-Type", "application/json")
 
-    payment.Notify(appengine.NewContext(r), r, p.ByName("order_id"))
+    payment.Notify(appengine.NewContext(r), r, p.ByName("vehicle_id"))
 }
