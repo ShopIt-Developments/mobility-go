@@ -29,14 +29,12 @@ func (*Payments) Scan(w http.ResponseWriter, r *http.Request, p httprouter.Param
 func (*Payments) Accept(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	w.Header().Set("Content-Type", "application/json")
 
-	err := payment.Accept(r.Body)
-	if err != nil {
+	if err := payment.Accept(r.Body); err != nil {
 		issue.Handle(w, err, http.StatusBadRequest)
 		return
 	}
 
-	_, err = order.Delete(appengine.NewContext(r), p.ByName("order_id"))
-	if err != nil {
+	if _, err := order.Delete(r, p.ByName("order_id")); err != nil {
 		issue.Handle(w, err, http.StatusInternalServerError)
 	}
 }
