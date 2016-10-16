@@ -45,12 +45,15 @@ func (*Vehicle) GetAvailable(w http.ResponseWriter, r *http.Request, p httproute
 
         vehicleId, _ := strconv.Atoi(strings.Split(p.VehicleId, " ")[0]);
         latitude, longitude := sasa.ToWgs84(bus.Geometry.Coordinates, 32)
+        variant, _ := strconv.Atoi(strings.Split(p.Variant, " ")[0])
 
         buses[key] = sasa.RealtimeBus{
             LineName: p.LineName,
+            LineId: p.LineId,
+            Variant: variant,
             BusStop: p.BusStopName,
             HydrogenBus: vehicleId >= 428 && vehicleId <= 432,
-            TripId: p.TripId,
+            TripId: strconv.Itoa(p.TripId),
             Latitude: latitude,
             Longitude: longitude,
         }
@@ -70,7 +73,7 @@ func (*Vehicle) GetAvailable(w http.ResponseWriter, r *http.Request, p httproute
 func (*Vehicle) GetMy(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
     w.Header().Set("Content-Type", "application/json")
 
-    vehicles, err := vehicle.GetMy(appengine.NewContext(r), network.Authorization(w, r))
+    vehicles, err := vehicle.GetMy(r, network.Authorization(w, r))
     issue.Handle(w, err, http.StatusBadRequest)
 
     data, err := json.Marshal(vehicles)

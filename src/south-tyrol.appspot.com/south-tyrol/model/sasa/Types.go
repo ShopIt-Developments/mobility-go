@@ -6,9 +6,11 @@ type RealtimeBuses struct {
 
 type RealtimeBus struct {
     LineName    string `json:"name"`
+    LineId      int `json:"line"`
+    Variant     int `json:"variant"`
     BusStop     string `json:"description"`
     HydrogenBus bool `json:"hydrogen_bus"`
-    TripId      int `json:"id"`
+    TripId      string `json:"id"`
     Latitude    float64 `json:"lat"`
     Longitude   float64 `json:"lng"`
 }
@@ -37,4 +39,5 @@ type Properties struct {
     LineName    string `json:"lidname"`
     BusStop     int `json:"ort_nr"`
     BusStopName string `json:"ort_name"`
+    Variant     string `json:"str_li_var"`
 }
