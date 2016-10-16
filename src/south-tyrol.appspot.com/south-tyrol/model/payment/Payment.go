@@ -87,28 +87,22 @@ func Accept(w http.ResponseWriter, r *http.Request, vehicleId string, userId str
         return err
     }
 
-    client := urlfetch.Client(c)
-    _, e := client.Get("https://sasa-bus.appspot.com/accept/" + owner.Token)
+    _, e := urlfetch.Client(c).Get("https://sasa-bus.appspot.com/accept/" + owner.Token)
 
-    if e != nil {
-        http.Error(w, err.Error(), http.StatusInternalServerError)
-        return
-    }
-
-    return err
+    return e
 }
 
 func Notify(w http.ResponseWriter, c appengine.Context, r *http.Request, vehicleId string) error {
     v, _ := vehicle.GetOne(c, r, vehicleId)
     u, _ := user.Get(c, v.Borrower)
 
-    client := urlfetch.Client(c)
-    _, e := client.Get("https://sasa-bus.appspot.com/accept/" + v.Owner + "/" + u.Name + "/" + v.QrCode)
+    owner, err := user.Get(c, v.Owner)
 
-    if e != nil {
-        http.Error(w, e.Error(), http.StatusInternalServerError)
-        return
+    if err != nil {
+        return err
     }
 
-    return nil
+    _, e := urlfetch.Client(c).Get("https://sasa-bus.appspot.com/notify/" + owner.Token + "/" + u.Name + "/" + v.QrCode)
+
+    return e
 }
