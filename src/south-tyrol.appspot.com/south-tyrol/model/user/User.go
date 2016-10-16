@@ -116,20 +116,20 @@ func Get(c appengine.Context, userId string) (*User, error) {
 }
 
 func GetAll(c appengine.Context) ([]User, error) {
-    q := datastore.NewQuery("User")
+	q := datastore.NewQuery("User")
 
-    users := []User{}
-    keys, err := q.GetAll(c, &users)
+	users := []User{}
+	keys, err := q.GetAll(c, &users)
 
-    if err != nil {
-        return nil, err
-    }
+	if err != nil {
+		return nil, err
+	}
 
-    for i := 0; i < len(users); i++ {
-        users[i].UserID = keys[i].StringID()
-    }
+	for i := 0; i < len(users); i++ {
+		users[i].UserID = keys[i].StringID()
+	}
 
-    return users, nil
+	return users, nil
 }
 
 func Update(c appengine.Context, userID string, r io.ReadCloser) (*User, error) {
