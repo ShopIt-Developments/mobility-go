@@ -17,7 +17,7 @@ type Payments struct {
 func (*Payments) Scan(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	w.Header().Set("Content-Type", "application/json")
 
-	newPayment, err := payment.New(appengine.NewContext(r), r.Body, p.ByName("order_id"))
+	newPayment, err := payment.New(appengine.NewContext(r), r, p.ByName("order_id"))
 	issue.Handle(w, err, http.StatusBadRequest)
 
 	data, err := json.Marshal(newPayment)
