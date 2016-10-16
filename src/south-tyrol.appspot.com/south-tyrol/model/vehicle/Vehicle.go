@@ -68,11 +68,11 @@ func GetBooked(r *http.Request, userId string) ([]Vehicle, error) {
     return vehicles, nil
 }
 
-func GetMy(c appengine.Context, userId string) ([]Vehicle, error) {
+func GetMy(r *http.Request, userId string) ([]Vehicle, error) {
     q := datastore.NewQuery("Vehicle").Filter("Owner =", userId)
 
     vehicles := []Vehicle{}
-    keys, err := q.GetAll(c, &vehicles)
+    keys, err := q.GetAll(appengine.NewContext(r), &vehicles)
 
     if err != nil {
         return nil, err
