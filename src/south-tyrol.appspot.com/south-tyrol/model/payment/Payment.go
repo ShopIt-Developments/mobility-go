@@ -99,7 +99,7 @@ func Accept(r *http.Request, vehicleId string) (error) {
         return nil, errors.New("QR codes do not match")
     }
 
-    payment.Price = v.PricePerHour * (float64(time.Now().Unix()) - float64(orders[0].OrderDate.Unix()) / float64(3600))
+	payment.Price = v.PricePerHour * (float64(time.Now().Hour()) - float64(orders[0].OrderDate.Hour()) + 1)
 
 	Vehicle, err := vehicle.GetOne(c, r, vehicleId)
 
